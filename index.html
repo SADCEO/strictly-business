@@ -4,18 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<script>
-(function(){
-  var RESET_KEY='sb-cache-reset-v4';
-  if(!localStorage.getItem(RESET_KEY)&&'serviceWorker' in navigator){
-    localStorage.setItem(RESET_KEY,'1');
-    Promise.all([
-      navigator.serviceWorker.getRegistrations().then(function(regs){return Promise.all(regs.map(function(r){return r.unregister();}));}).catch(function(){}),
-      caches.keys().then(function(keys){return Promise.all(keys.map(function(k){return caches.delete(k);}));}).catch(function(){})
-    ]).then(function(){location.reload(true);});
-  }
-})();
-</script>
 <meta name="theme-color" content="#FBF4EC">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -222,7 +210,7 @@ let DATA=null,LIST=[],SEARCH_INDEX=[];
 /* theme */
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('tgl').innerHTML=`<i class=”ti ti-${t==='dark'?'sun':'moon'}”></i>`;const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#171310':'#FBF4EC')}
 applyTheme(localStorage.getItem('sb-theme')||'light');
-document.getElementById('tgl').onclick=()=>{const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';localStorage.setItem('sb-theme',n);applyTheme(n);if(DATA)home();};
+document.getElementById('tgl').onclick=()=>{const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';localStorage.setItem('sb-theme',n);applyTheme(n)};
 
 /* ---- passcode unlock + AES-GCM decrypt (Web Crypto) ---- */
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
@@ -248,7 +236,6 @@ async function tryUnlock(pass,silent){
     document.getElementById('lock').style.display='none';
     try{home();}catch(he){console.error('home render error',he);document.getElementById('cats').innerHTML='<div class="empty">Something went wrong — please reload the page.</div>';}
     try{buildIndex();}catch(ie){console.warn('search index build failed',ie);}
-    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }catch(e){
     if(!silent){err.textContent='Not quite. Try again.';btn.disabled=false;btn.innerHTML='<i class=”ti ti-lock-open”></i> Enter';clearBoxes();}
     else sessionStorage.removeItem('sb-pass');
@@ -342,16 +329,11 @@ function extractSnippet(text,tokens){
 /* ---- rendering ---- */
 function home(){
   const s=DATA.stats;
-  const dk=document.documentElement.getAttribute('data-theme')==='dark';
-  const cardBg=dk?'#221D18':'#FFFFFF';
-  const lineBd=dk?'#332B23':'#F0E6D9';
-  const faintC=dk?'#6E6356':'#A99C8E';
-  const softC=dk?'#A99C8D':'#7C7065';
-  document.getElementById('stats').innerHTML=`<div class=”stat” style=”flex:1;background:${cardBg};border-radius:16px;padding:14px;border:2px solid ${lineBd}”><b style=”font-size:21px;font-weight:800;display:block;letter-spacing:-.02em”>${s.listed.toLocaleString()}</b><span style=”font-size:11px;color:${faintC};font-weight:700;margin-top:3px;display:block;letter-spacing:.03em”>RECOMMENDED</span></div><div class=”stat” style=”flex:1;background:${cardBg};border-radius:16px;padding:14px;border:2px solid ${lineBd}”><b style=”font-size:21px;font-weight:800;display:block;letter-spacing:-.02em”>${s.categories}</b><span style=”font-size:11px;color:${faintC};font-weight:700;margin-top:3px;display:block;letter-spacing:.03em”>TRADES</span></div><div class=”stat” style=”flex:1;background:${cardBg};border-radius:16px;padding:14px;border:2px solid ${lineBd}”><b style=”font-size:21px;font-weight:800;display:block;letter-spacing:-.02em”>8 yrs</b><span style=”font-size:11px;color:${faintC};font-weight:700;margin-top:3px;display:block;letter-spacing:.03em”>OF CHAT</span></div>`;
+  document.getElementById('stats').innerHTML=`<div class=”stat”><b>${s.listed.toLocaleString()}</b><span>RECOMMENDED</span></div><div class=”stat”><b>${s.categories}</b><span>TRADES</span></div><div class=”stat”><b>8 yrs</b><span>OF CHAT</span></div>`;
   document.getElementById('trc').textContent=`${DATA.categories.length} trades`;
   document.getElementById('uvCt').textContent=`${s.unverified.toLocaleString()} contacts`;
-  document.getElementById('cats').innerHTML=DATA.categories.map((c,i)=>{const cc=col(c.name);return `<button class=”cat” style=”background:${cardBg};border:2px solid ${lineBd};border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:12px;min-height:122px;cursor:pointer;transition:transform .16s,box-shadow .16s” data-i=”${i}”><div class=”ic” style=”width:50px;height:50px;border-radius:16px;display:grid;place-items:center;font-size:25px;background:${cc}22;color:${cc}”>${ico(c.name)}</div><div><div class=”nm” style=”font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.15”>${c.name}</div><div class=”ct” style=”font-size:12.5px;color:${softC};font-weight:600;margin-top:4px”>${c.count} ${c.count===1?'person':'people'}</div></div></button>`;}).join('');
-  document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>openCat(DATA.categories[b.dataset.i]));
+  document.getElementById('cats').innerHTML=DATA.categories.map((c,i)=>`<button class=”cat” data-i=”${i}”><div class=”ic” style=”--c:${col(c.name)}”>${ico(c.name)}</div><div><div class=”nm”>${c.name}</div><div class=”ct”>${c.count} ${c.count===1?'person':'people'}</div></div></button>`).join('');
+  document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>openCat(DATA.categories[+b.dataset.i]));
   document.getElementById('uvBtn').onclick=openUnverified;
   show('home');
 }
@@ -500,6 +482,11 @@ const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]
     banner.classList.remove('show');
     localStorage.setItem('pwa-dismissed','1');
   };
+})();
+</script>
+<script>
+(function(){
+  if('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});});
 })();
 </script>
 </body></html>
