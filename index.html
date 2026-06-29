@@ -347,6 +347,8 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
     <p class="msub">Let the admins know this is you</p>
     <p style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:16px" id="claimTarget"></p>
     <button class="mbtn" id="claimSubmit"><i class="ti ti-send"></i> Submit Claim</button>
+    <label style="display:block;margin-top:16px;font-size:12px;font-weight:600;color:var(--soft);text-align:left">Alternative Phone or Verification Note (Optional)</label>
+    <textarea id="claimVerify" style="width:100%;min-height:60px;margin-top:6px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-size:13px;font-family:inherit;resize:vertical" placeholder="If the number on this profile is old, how else can we verify this is you?"></textarea>
     <div class="merr" id="claimErr"></div>
   </div>
 </div>
@@ -725,9 +727,11 @@ document.getElementById('correctClose').onclick=()=>correctModal.classList.remov
 correctModal.onclick=e=>{if(e.target===correctModal)correctModal.classList.remove('active')};
 
 document.getElementById('claimBtn').onclick=()=>{
+  if(!window.userProfile){alert("You must be logged in to claim a profile.");return;}
   if(!currentUser){setAuthMode('signup');authModal.classList.add('active');return;}
   document.getElementById('claimTarget').textContent='Claiming: '+window._currentViewedContact.name;
   document.getElementById('claimErr').textContent='';
+  document.getElementById('claimVerify').value='';
   claimModal.classList.add('active');
 };
 document.getElementById('correctBtn').onclick=()=>{
@@ -741,11 +745,13 @@ document.getElementById('correctBtn').onclick=()=>{
 document.getElementById('claimSubmit').onclick=async()=>{
   const btn=document.getElementById('claimSubmit');
   btn.disabled=true;
+  const verifyNotes=document.getElementById('claimVerify').value.trim()||null;
   const{error}=await supabase.from('profile_claims').insert({
     user_id:currentUser.id,
     requester_email:currentUser.email||null,
     target_contact_name:window._currentViewedContact.name,
-    target_contact_category:window._currentViewedContact.category||null
+    target_contact_category:window._currentViewedContact.category||null,
+    verification_notes:verifyNotes
   });
   if(error){document.getElementById('claimErr').textContent=error.message;btn.disabled=false;return;}
   btn.disabled=false;
@@ -809,10 +815,11 @@ async function loadAdmin(){
       const email=c.requester_email?`<div class="ai-email">${esc(c.requester_email)}</div>`:'';
       const del=`<button class="del-rec" onclick="deleteRequestRecord('profile_claims','${c.id}')"><i class="ti ti-trash"></i></button>`;
       if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-top"><span class="ai-status ${c.status}">${c.status}</span>${del}</div></div>`;
+      const vNote=c.verification_notes?`<div class="ai-note" style="font-style:italic;color:var(--brand)"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:middle;margin-right:4px"></i>${esc(c.verification_notes)}</div>`:'';
       const phone=findPhoneByName(c.target_contact_name);
       const smsBody=encodeURIComponent('Strictly Business Admin: Did you request to claim your directory profile using the email '+(c.requester_email||'unknown')+'? Reply YES to confirm.');
       const sms=phone?`<a class="sms-verify" href="sms:${phone}?&body=${smsBody}"><i class="ti ti-message-forward"></i> Verify via SMS</a>`:'';
-      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button>${sms}${del}</div></div>`;
+      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}${vNote}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button>${sms}${del}</div></div>`;
     }).join('');
   }else{
     const{data,error}=await supabase.from('correction_requests').select('*').order('created_at',{ascending:false});

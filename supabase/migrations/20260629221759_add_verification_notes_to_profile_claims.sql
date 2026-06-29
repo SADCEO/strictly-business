@@ -1,0 +1,1 @@
+ALTER TABLE profile_claims ADD COLUMN IF NOT EXISTS verification_notes TEXT;
