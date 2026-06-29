@@ -577,16 +577,34 @@ const supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY);
 
 let currentUser=null;
 let userProfile=null;
+let _authReady=false;
+let _authInitResolve=null;
+const _authInitPromise=new Promise(r=>{_authInitResolve=r;});
 
 async function initAuth(){
   const{data:{session}}=await supabase.auth.getSession();
   if(session) await setUser(session.user);
+  _authReady=true;
+  _authInitResolve();
 }
 
 async function setUser(user){
   currentUser=user;
-  const{data}=await supabase.from('user_profiles').select('*').eq('id',user.id).maybeSingle();
-  userProfile=data;
+  try{
+    const{data,error}=await supabase.from('user_profiles').select('*').eq('id',user.id).maybeSingle();
+    if(error){
+      console.error('[StrictlyBiz] Failed to fetch user profile:',error.message);
+      userProfile={id:user.id,role:'user'};
+    }else if(!data){
+      console.warn('[StrictlyBiz] No user_profiles row for user, defaulting to role:user');
+      userProfile={id:user.id,role:'user'};
+    }else{
+      userProfile=data;
+    }
+  }catch(e){
+    console.error('[StrictlyBiz] Exception fetching user profile:',e);
+    userProfile={id:user.id,role:'user'};
+  }
   window.userProfile=userProfile;
   if(userProfile&&userProfile.preferred_theme){
     applyTheme(userProfile.preferred_theme);
@@ -909,7 +927,8 @@ function gateUnauthenticated(){
   }
 }
 
-window._onDataReady=function(){
+window._onDataReady=async function(){
+  await _authInitPromise;
   if(currentUser){enterApp();}
   else{gateUnauthenticated();}
 };
@@ -922,6 +941,7 @@ initAuth().then(()=>{
 });
 
 supabase.auth.onAuthStateChange(async(event,session)=>{
+  if(!_authReady) return;
   if(event==='SIGNED_IN'&&session){
     await setUser(session.user);
     if(DATA){enterApp();}
