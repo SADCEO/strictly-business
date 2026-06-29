@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FBF4EC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Strictly Biz">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.png">
+<title>Strictly Business</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css" rel="stylesheet">
+<style>
+:root{--bg:#FBF4EC;--card:#FFFFFF;--card2:#FFFFFF;--ink:#28211B;--soft:#7C7065;--faint:#A99C8E;--line:#F0E6D9;--brand:#E2613C;--brand-ink:#fff;--shadow:0 12px 28px rgba(40,33,27,.10)}
+:root[data-theme="dark"]{--bg:#171310;--card:#221D18;--card2:#2A241E;--ink:#F4EDE3;--soft:#A99C8D;--faint:#6E6356;--line:#332B23;--brand:#F0794E;--brand-ink:#1a0c05;--shadow:0 14px 32px rgba(0,0,0,.45)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:var(--bg);max-width:1180px;margin:0 auto;padding:0 18px 0}
+button,a{font-family:inherit;color:inherit;text-decoration:none;cursor:pointer;border:none;background:none}
+.ti{font-size:inherit}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:calc(14px + env(safe-area-inset-top)) 0 12px}
+.top{display:flex;align-items:center;gap:11px}
+.logo{width:80px;height:80px;flex:none;display:grid;place-items:center;cursor:pointer}
+.top h1{font-size:18.5px;font-weight:800;letter-spacing:-.02em}
+.top .tag{font-size:11.5px;color:var(--soft);margin-top:1px;font-weight:500}
+.tgl{margin-left:auto;width:38px;height:38px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--soft);display:grid;place-items:center;font-size:18px;flex:none}
+.tgl:hover{color:var(--brand);border-color:var(--brand)}
+.search{margin-top:14px;position:relative}
+.search::before{content:'';position:absolute;inset:-2px;border-radius:20px;padding:2px;background:conic-gradient(from var(--search-angle,0deg),#8B1A1A 0%,#8B1A1A 38%,#2E7BFF 48%,#2E7BFF 52%,#8B1A1A 62%,#8B1A1A 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.45;transition:opacity .3s;pointer-events:none;animation:searchSpin 4s linear infinite}
+.search:hover::before{opacity:.75}
+.search:focus-within::before{opacity:1}
+@property --search-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes searchSpin{to{--search-angle:360deg}}
+.search input{width:100%;height:52px;border-radius:18px;background:var(--card);border:2px solid var(--line);color:var(--ink);font-size:15px;font-weight:500;padding:0 16px 0 48px;outline:none;transition:border-color .15s;position:relative;z-index:1}
+.search input::placeholder{color:var(--faint)}
+.search input:focus{border-color:var(--brand)}
+.search > i{position:absolute;left:17px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--brand);z-index:2}
+.search-bubble{position:absolute;top:calc(100% + 8px);left:16px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:600;color:var(--soft);box-shadow:0 8px 20px rgba(40,33,27,.1);opacity:0;transform:translateY(-4px);transition:opacity .25s,transform .25s;pointer-events:none;z-index:10;white-space:nowrap}
+.search-bubble::before{content:'';position:absolute;top:-5px;left:24px;width:10px;height:10px;background:var(--card);border-left:1.5px solid var(--line);border-top:1.5px solid var(--line);transform:rotate(45deg)}
+.search:focus-within .search-bubble{opacity:1;transform:translateY(0)}
+:root[data-theme="dark"] .search-bubble{box-shadow:0 10px 24px rgba(0,0,0,.4)}
+.hero{padding:24px 4px 4px}
+.hero h2{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.08}
+.stats{display:flex;gap:10px;margin-top:20px}
+.stat{flex:1;background:var(--card);border-radius:16px;padding:14px;border:2px solid var(--line)}
+.stat b{font-size:21px;font-weight:800;display:block;letter-spacing:-.02em}
+.stat span{font-size:11px;color:var(--faint);font-weight:700;margin-top:3px;display:block;letter-spacing:.03em}
+.sl{font-size:16px;font-weight:800;letter-spacing:-.01em;margin:30px 4px 14px;display:flex;align-items:center;justify-content:space-between}
+.sl .mut{font-size:12.5px;color:var(--faint);font-weight:600}
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;perspective:1200px;scroll-snap-type:y proximity}
+.cat{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:12px;min-height:122px;transform-style:preserve-3d;will-change:transform;transition:transform .28s cubic-bezier(.22,.68,0,1.1),box-shadow .28s ease,border-color .28s ease;box-shadow:0 2px 8px rgba(40,33,27,.06),0 6px 20px rgba(40,33,27,.04),inset 0 1px 0 rgba(226,97,60,.08);scroll-snap-align:start}
+.cat:hover{transform:translateY(-6px) scale(1.025) rotateX(1.5deg) rotateY(-1deg);box-shadow:0 8px 24px rgba(40,33,27,.1),0 16px 40px rgba(40,33,27,.08),inset 0 1px 0 rgba(226,97,60,.14);border-color:color-mix(in srgb,var(--brand) 30%,var(--line))}
+.cat:active{transform:translateY(-1px) scale(0.98);box-shadow:0 1px 4px rgba(40,33,27,.08);transition-duration:.1s}
+@supports (animation-timeline:view()){.cat{animation:cardDepth linear both;animation-timeline:view();animation-range:entry 0% cover 50%}@keyframes cardDepth{0%{opacity:.7;transform:scale(.94) translateZ(-20px)}100%{opacity:1;transform:scale(1) translateZ(0)}}}
+:root[data-theme="dark"] .cat{box-shadow:0 2px 8px rgba(0,0,0,.2),0 6px 20px rgba(0,0,0,.15),inset 0 1px 0 rgba(226,97,60,.06)}
+:root[data-theme="dark"] .cat:hover{box-shadow:0 8px 24px rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.2),inset 0 1px 0 rgba(226,97,60,.1)}
+.ic{border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+:root[data-theme="dark"] .ic{background:color-mix(in srgb,var(--c) 24%,transparent);color:color-mix(in srgb,var(--c) 72%,#fff)}
+.cat .ic{width:50px;height:50px;font-size:25px}
+.cat .nm{font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.15;margin-top:auto}
+.cat .ct{font-size:12.5px;color:var(--soft);font-weight:600}
+.uv{margin-top:12px;background:var(--card);border:2px dashed var(--line);border-radius:20px;padding:16px;display:flex;align-items:center;gap:13px;width:100%;text-align:left}
+.uv .ic{width:48px;height:48px;font-size:23px;flex:none;--c:#C98A1E}
+.uv .nm{font-size:14.5px;font-weight:700}.uv .ds{font-size:12px;color:var(--faint);margin-top:2px;font-weight:500}
+.uv .ar{margin-left:auto;color:var(--faint);font-size:20px}
+#detail,#profile,#settings,#admin{display:none}
+#home{display:flex;flex-direction:column;min-height:100dvh}
+.back{display:inline-flex;align-items:center;gap:5px;font-size:14px;color:var(--soft);font-weight:600;padding:18px 2px 8px}
+.back:hover{color:var(--brand)}
+.dhead{display:flex;align-items:center;gap:14px;padding:4px 2px}
+.dhead .ic{width:58px;height:58px;font-size:28px;flex:none}
+.dhead h2{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.dhead p{font-size:13px;color:var(--soft);margin-top:3px;font-weight:500}
+.list{display:flex;flex-direction:column;gap:11px;margin-top:18px}
+.row{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:15px;display:flex;gap:13px;align-items:flex-start;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.row:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.av{width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;background:var(--c)}
+.rb{flex:1;min-width:0}
+.rtop{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.medal{font-size:15px}
+.rn{font-size:15.5px;font-weight:700;letter-spacing:-.01em}
+.bd{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+.bd.c{background:color-mix(in srgb,#3E8E4F 16%,transparent);color:#3E8E4F}
+.bd.l{background:color-mix(in srgb,#C98A1E 16%,transparent);color:#C98A1E}
+.rm{font-size:12.5px;color:var(--soft);margin-top:5px;font-weight:600}.rm b{color:var(--ink)}
+.asks{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}
+.ask{font-size:11.5px;font-weight:600;color:var(--soft);background:var(--bg);border:1.5px solid var(--line);padding:4px 10px;border-radius:30px}
+.chev{align-self:center;color:var(--faint);font-size:19px;flex:none}
+.call{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 16px;border-radius:14px;font-weight:700;font-size:14px;color:var(--brand-ink);background:var(--brand);box-shadow:0 8px 18px rgba(226,97,60,.26)}
+.empty{padding:60px;text-align:center;color:var(--faint);font-weight:600}
+/* profile */
+.pcard{text-align:center;padding:10px 0 2px}
+.pav{width:88px;height:88px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;font-weight:800;font-size:32px;color:#fff;background:var(--c);box-shadow:0 12px 28px rgba(40,33,27,.18)}
+.pname{font-size:25px;font-weight:800;letter-spacing:-.02em}
+.pcat{margin-top:10px;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;padding:6px 14px;border-radius:30px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+.pstats{display:flex;margin:22px 0 4px;border:2px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}
+.ps{flex:1;padding:15px 8px;text-align:center}.ps+.ps{border-left:2px solid var(--line)}
+.ps b{font-size:22px;font-weight:800;display:block;letter-spacing:-.02em}
+.ps span{font-size:10.5px;color:var(--faint);font-weight:700;margin-top:3px;display:block;letter-spacing:.04em}
+.pcall{margin:18px 0 4px;height:52px;width:100%;border-radius:16px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px;color:var(--brand-ink);background:var(--brand);box-shadow:0 10px 22px rgba(226,97,60,.3)}
+.psec{font-size:13px;font-weight:800;letter-spacing:-.01em;margin:26px 2px 12px}
+.recfor{display:flex;flex-wrap:wrap;gap:8px;margin:0 2px 8px}
+.recfor .ask{font-size:12.5px;background:var(--card);border:2px solid var(--line)}
+.trade{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.trade .th{display:flex;align-items:center;gap:10px}
+.trade .ti0{width:34px;height:34px;border-radius:10px;font-size:18px;flex:none}
+.trade .tn{font-size:14.5px;font-weight:700;flex:1}.trade .tv{font-size:12px;color:var(--soft);font-weight:700}
+.trade .tq{font-size:12.5px;color:var(--soft);margin-top:9px;line-height:1.5;padding-left:44px;font-style:italic}
+.trade .tq::before{content:"“"}.trade .tq::after{content:"”"}
+.thread{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;margin-bottom:11px}
+.thread .qh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.thread .who{font-size:12px;font-weight:700;color:var(--ink)}
+.thread .dt{font-size:11px;color:var(--faint);font-weight:600;white-space:nowrap}
+.thread .qt{font-size:14px;line-height:1.45;font-weight:500;color:var(--ink);padding-left:12px;border-left:3px solid color-mix(in srgb,var(--c) 55%,var(--line))}
+.thread .ans{display:flex;align-items:center;gap:7px;margin-top:11px;font-size:12.5px;color:var(--soft);font-weight:600}
+.thread .ans i{color:var(--c);font-size:15px}
+.thread .ans b{color:var(--ink);font-weight:700}
+/* footer */
+footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;line-height:1.2}
+.foot-copy{font-size:12px;font-weight:600;color:var(--faint);letter-spacing:.01em}
+.foot-copy a{color:var(--brand);font-weight:700}
+/* pwa banner */
+#pwa-banner{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(120px);z-index:90;width:calc(100% - 36px);max-width:420px;background:var(--card);border:2px solid var(--line);border-radius:24px;padding:18px 18px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;transition:transform .38s cubic-bezier(.34,1.42,.64,1),opacity .3s;opacity:0;pointer-events:none}
+#pwa-banner.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+.pwa-top{display:flex;align-items:center;gap:13px}
+.pwa-icon{width:48px;height:48px;border-radius:14px;overflow:hidden;flex:none;background:var(--bg);border:1.5px solid var(--line);display:grid;place-items:center}
+.pwa-icon img{width:100%;height:100%;object-fit:contain}
+.pwa-copy{flex:1;min-width:0}
+.pwa-copy strong{font-size:15px;font-weight:800;letter-spacing:-.01em;display:block}
+.pwa-copy span{font-size:12.5px;color:var(--soft);font-weight:500;margin-top:2px;display:block}
+.pwa-close{width:30px;height:30px;border-radius:50%;background:var(--bg);color:var(--faint);font-size:16px;display:grid;place-items:center;flex:none;align-self:flex-start;border:1.5px solid var(--line)}
+.pwa-close:hover{color:var(--ink)}
+.pwa-actions{display:flex;gap:9px}
+#pwa-btn{flex:1;height:44px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px}
+.pwa-ios-steps{font-size:12.5px;color:var(--soft);font-weight:500;line-height:1.55;background:var(--bg);border-radius:14px;padding:12px 14px;border:1.5px solid var(--line)}
+.pwa-ios-steps b{color:var(--ink);font-weight:700}
+@media(min-width:600px){.cats{grid-template-columns:repeat(3,1fr)}.hero h2{font-size:38px}}
+@media(min-width:900px){.cats{grid-template-columns:repeat(4,1fr)}.list{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}}
+@media(min-width:1140px){.cats{grid-template-columns:repeat(5,1fr)}}
+/* lock screen */
+#lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+#lock .llogo{width:166px;height:166px;display:grid;place-items:center;margin-bottom:22px}
+#lock h2{font-size:23px;font-weight:800;letter-spacing:-.02em}
+#lock .hint{font-size:17px;color:var(--ink);margin-top:14px;font-weight:600;max-width:26ch;line-height:1.35;font-style:italic}
+#lock .lform{margin-top:28px;width:100%;max-width:320px}
+#lock .glabel{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+#lock .boxes{display:flex;gap:12px;justify-content:center}
+#lock .dbox{width:62px;height:70px;border-radius:18px;background:var(--card);border:2px solid var(--line);color:var(--ink);font-size:30px;font-weight:800;text-align:center;outline:none;transition:border-color .14s,transform .14s}
+#lock .dbox:focus{border-color:var(--brand);transform:translateY(-2px)}
+#lock button{margin-top:18px;width:100%;height:52px;border-radius:16px;background:var(--brand);color:var(--brand-ink);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px}
+#lock button:disabled{opacity:.6}
+#lock .err{color:#C9453F;font-size:13px;font-weight:600;margin-top:12px;min-height:18px}
+#lock .foot{margin-top:24px;font-size:11.5px;color:var(--faint);font-weight:500;display:flex;align-items:center;gap:6px}
+/* auth modal */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.active{opacity:1;pointer-events:auto}
+.modal{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:28px 24px;width:100%;max-width:380px;max-height:90vh;overflow-y:auto;position:relative}
+.modal h3{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.modal .msub{font-size:13px;color:var(--soft);font-weight:500;margin-bottom:20px}
+.modal label{display:block;font-size:12px;font-weight:700;color:var(--soft);margin-bottom:6px;letter-spacing:.02em}
+.modal input[type="email"],.modal input[type="password"],.modal input[type="text"],.modal textarea{width:100%;height:44px;border-radius:12px;background:var(--bg);border:2px solid var(--line);color:var(--ink);font-size:14px;font-weight:500;padding:0 14px;outline:none;transition:border-color .15s;font-family:inherit}
+.modal textarea{height:100px;padding:12px 14px;resize:vertical}
+.modal input:focus,.modal textarea:focus{border-color:var(--brand)}
+.modal .field{margin-bottom:14px}
+.modal .mbtn{width:100%;height:48px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px;transition:opacity .15s}
+.modal .mbtn:disabled{opacity:.6}
+.modal .mswitch{font-size:13px;color:var(--soft);text-align:center;margin-top:10px;font-weight:500}
+.modal .mswitch a{color:var(--brand);font-weight:700;cursor:pointer}
+.modal .merr{color:#C9453F;font-size:12.5px;font-weight:600;margin-top:10px;min-height:16px;text-align:center}
+.modal .mclose{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line);color:var(--faint);font-size:16px;display:grid;place-items:center}
+.modal .mclose:hover{color:var(--ink)}
+.gem-hint{display:block;font-size:0.8rem;font-style:italic;color:var(--faint);margin:6px 0 12px;font-weight:500}
+.gem-boxes{display:flex;gap:12px;justify-content:center}
+.gem-box{width:3rem;height:3rem;text-align:center;font-size:1.5rem;font-weight:700;border-radius:8px;background:var(--bg);border:2px solid var(--line);color:var(--ink);outline:none;transition:border-color .15s,transform .15s;font-family:inherit}
+.gem-box:focus{border-color:var(--brand);transform:translateY(-2px)}
+/* user menu button */
+.ubtn{width:38px;height:38px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--soft);display:grid;place-items:center;font-size:18px;flex:none}
+.ubtn:hover{color:var(--brand);border-color:var(--brand)}
+/* settings view */
+#settings{padding-bottom:40px}
+.set-card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
+.set-card .set-title{font-size:14px;font-weight:700;margin-bottom:10px}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
+.set-row+.set-row{border-top:1.5px solid var(--line)}
+.set-row span{font-size:13.5px;font-weight:600}
+.toggle-sw{width:44px;height:26px;border-radius:13px;background:var(--line);position:relative;cursor:pointer;transition:background .2s;flex:none}
+.toggle-sw.on{background:var(--brand)}
+.toggle-sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.15)}
+.toggle-sw.on::after{transform:translateX(18px)}
+/* profile action buttons */
+.pactions{display:flex;gap:10px;margin:18px 0 6px}
+.pactions .pact{flex:1;height:44px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--ink);transition:border-color .15s,background .15s}
+.pactions .pact:hover{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--card))}
+.pactions .pact-admin{border-color:#C9453F;color:#C9453F}
+.pactions .pact-admin:hover{background:color-mix(in srgb,#C9453F 10%,var(--card));border-color:#C9453F}
+.admin-item .ai-email{font-size:12px;color:var(--faint);font-weight:500;margin-bottom:4px}
+/* admin */
+#admin{padding-bottom:40px}
+.admin-tab{display:flex;gap:8px;margin:14px 0 18px}
+.admin-tab button{height:36px;padding:0 16px;border-radius:10px;font-size:13px;font-weight:700;border:2px solid var(--line);background:var(--card);color:var(--soft);transition:all .15s}
+.admin-tab button.active{border-color:var(--brand);color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--card))}
+.admin-item{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
+.admin-item .ai-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.admin-item .ai-name{font-size:14px;font-weight:700;flex:1}
+.admin-item .ai-date{font-size:11px;color:var(--faint);font-weight:600}
+.admin-item .ai-note{font-size:13px;color:var(--soft);line-height:1.45;margin-bottom:10px}
+.admin-item .ai-actions{display:flex;gap:8px}
+.admin-item .ai-actions button{height:34px;padding:0 14px;border-radius:10px;font-size:12.5px;font-weight:700;border:none;cursor:pointer}
+.admin-item .ai-actions .approve{background:#3E8E4F;color:#fff}
+.admin-item .ai-actions .reject{background:var(--bg);border:1.5px solid var(--line);color:var(--soft)}
+.admin-item .ai-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;display:inline-block}
+.admin-item .ai-status.approved{background:color-mix(in srgb,#3E8E4F 16%,transparent);color:#3E8E4F}
+.admin-item .ai-status.rejected{background:color-mix(in srgb,#C9453F 16%,transparent);color:#C9453F}
+.del-rec{width:34px;height:34px;border-radius:10px;border:1.5px solid #C9453F;background:transparent;color:#C9453F;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:15px;transition:background .15s}
+.del-rec:hover{background:color-mix(in srgb,#C9453F 12%,transparent)}
+.sms-verify{height:34px;padding:0 12px;border-radius:10px;border:1.5px solid #2A8C86;background:transparent;color:#2A8C86;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;text-decoration:none;transition:background .15s}
+.sms-verify:hover{background:color-mix(in srgb,#2A8C86 12%,transparent)}
+.pact-share{border-color:#2A8C86;color:#2A8C86}
+.pact-share:hover{background:color-mix(in srgb,#2A8C86 10%,transparent)}
+/* trainer modal */
+#trainer-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
+#trainer-overlay.active{opacity:1;pointer-events:auto}
+#trainer-modal{background:var(--card);border:2px solid var(--line);border-radius:28px;padding:36px 28px 28px;width:100%;max-width:380px;position:relative;box-shadow:0 24px 60px rgba(40,33,27,.25);transform:translateY(20px) scale(.96);transition:transform .35s cubic-bezier(.22,.68,0,1.1);text-align:center}
+#trainer-overlay.active #trainer-modal{transform:translateY(0) scale(1)}
+#trainer-modal .tr-icon{width:56px;height:56px;border-radius:16px;background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand);display:grid;place-items:center;font-size:26px;margin:0 auto 18px}
+#trainer-modal .tr-text{font-size:15px;font-weight:500;line-height:1.55;color:var(--ink);min-height:60px;margin-bottom:22px}
+#trainer-modal .tr-dots{display:flex;gap:8px;justify-content:center;margin-bottom:22px}
+#trainer-modal .tr-dot{width:8px;height:8px;border-radius:50%;background:var(--line);transition:background .2s,transform .2s}
+#trainer-modal .tr-dot.active{background:var(--brand);transform:scale(1.3)}
+#trainer-modal .tr-next{width:100%;height:48px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+#trainer-modal .tr-skip{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line);color:var(--faint);font-size:16px;display:grid;place-items:center}
+#trainer-modal .tr-skip:hover{color:var(--ink)}
+</style></head>
+<body>
+<div id="lock">
+  <div class="llogo"><img src="logo.png" alt="Strictly Business" style="width:100%;height:100%;object-fit:contain"></div>
+  <h2>Strictly Business</h2>
+  <p class="hint">What is Klal Yisrael waiting for?</p>
+  <form class="lform" id="lform">
+    <div class="glabel">Enter the gematria</div>
+    <div class="boxes" id="boxes">
+      <input class="dbox" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" aria-label="Gematria digit 1">
+      <input class="dbox" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" aria-label="Gematria digit 2">
+      <input class="dbox" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" aria-label="Gematria digit 3">
+    </div>
+    <button type="submit" id="lbtn"><i class="ti ti-lock-open"></i> Enter</button>
+    <div class="err" id="lerr"></div>
+  </form>
+</div>
+<h2 class="sr-only">Strictly Business community recommendations</h2>
+<header>
+  <div class="top">
+    <div class="logo"><img src="logo.png" alt="Strictly Business" style="width:100%;height:100%;object-fit:contain"></div>
+    <button class="tgl" id="tgl" aria-label="Toggle dark mode"><i class="ti ti-moon"></i></button>
+    <button class="ubtn" id="userBtn" aria-label="Account"><i class="ti ti-user"></i></button>
+  </div>
+  <div class="search"><i class="ti ti-search"></i><input id="q" placeholder="Search a trade/name or type anything..." autocomplete="off"><div class="search-bubble"><i class="ti ti-sparkles" style="font-size:13px;color:var(--brand);vertical-align:middle;margin-right:4px"></i>I'm a smart search! Type any word to see suggestions.</div></div>
+</header>
+<main id="home">
+  <div class="hero"><div class="stats" id="stats"></div></div>
+  <div class="sl">Browse by trade <span class="mut" id="trc"></span></div>
+  <div class="cats" id="cats"></div>
+  <div class="sl">Still being sorted</div>
+  <button class="uv" id="uvBtn"><div class="ic"><i class="ti ti-help-circle"></i></div>
+    <div><div class="nm">Unsorted leads</div><div class="ds" id="uvCt"></div></div>
+    <div class="ar"><i class="ti ti-chevron-right"></i></div></button>
+  <footer>
+    <div class="foot-copy">&copy; 2026 <a href="https://strict.business" target="_blank" rel="noopener">strict.business</a> &mdash; All rights reserved.</div>
+  </footer>
+</main>
+<section id="detail">
+  <button class="back" id="back"><i class="ti ti-chevron-left"></i> Back</button>
+  <div class="dhead"><div class="ic" id="dIco"></div><div><h2 id="dTitle"></h2><p id="dSub"></p></div></div>
+  <div class="list" id="dList"></div>
+</section>
+<section id="profile">
+  <button class="back" id="pback"><i class="ti ti-chevron-left"></i> Back</button>
+  <div class="pcard">
+    <div class="pav" id="pAv"></div><div class="pname" id="pName"></div>
+    <div class="pcat" id="pCat"></div>
+    <div class="pstats" id="pStats"></div>
+    <a class="pcall" id="pCall"><i class="ti ti-phone"></i><span></span></a>
+  </div>
+  <div id="pRecWrap"><div class="psec">Recommended for</div><div class="recfor" id="pRec"></div></div>
+  <div class="pactions" id="pActions" style="display:none">
+    <button class="pact" id="correctBtn"><i class="ti ti-edit"></i> Suggest Correction</button>
+    <button class="pact pact-share" id="shareBtn"><i class="ti ti-share-2"></i> Share Profile</button>
+    <button class="pact pact-admin" id="masterEditBtn" style="display:none"><i class="ti ti-shield-lock"></i> Master Edit</button>
+  </div>
+  <div id="pThreadWrap"><div class="psec">From the chat</div><div id="pThreads"></div></div>
+  <div id="pTradeWrap"><div class="psec">Also found under</div><div id="pTrades"></div></div>
+</section>
+<section id="settings">
+  <button class="back" id="setBack"><i class="ti ti-chevron-left"></i> Back</button>
+  <div class="dhead"><div class="ic" style="--c:#3B6FC4"><i class="ti ti-settings"></i></div><div><h2>Settings</h2><p>Manage your preferences</p></div></div>
+  <div class="set-card" style="margin-top:18px">
+    <div class="set-title">Appearance</div>
+    <div class="set-row"><span>Dark Mode</span><div class="toggle-sw" id="themeToggleSw"></div></div>
+  </div>
+  <div class="set-card">
+    <div class="set-title">Account</div>
+    <div class="set-row"><span id="setEmail">Not signed in</span></div>
+    <div class="set-row"><button class="mbtn" id="logoutBtn" style="margin:0;height:40px;font-size:13px"><i class="ti ti-logout"></i> Sign Out</button></div>
+  </div>
+  <div class="set-card">
+    <div class="set-title">Help</div>
+    <div class="set-row"><span>App Tutorial</span><button class="mbtn" id="replayTutorial" style="margin:0;width:auto;height:36px;padding:0 16px;font-size:12.5px"><i class="ti ti-player-play"></i> Replay</button></div>
+  </div>
+  <div class="set-card" id="adminCard" style="display:none">
+    <div class="set-title">Administration</div>
+    <div class="set-row"><span>Manage corrections & overrides</span><button class="mbtn" id="goAdminBtn" style="margin:0;width:auto;height:36px;padding:0 16px;font-size:12.5px;background:#C9453F"><i class="ti ti-shield-lock"></i> Admin Dashboard</button></div>
+  </div>
+</section>
+<section id="admin">
+  <button class="back" id="adminBack"><i class="ti ti-chevron-left"></i> Back</button>
+  <div class="dhead"><div class="ic" style="--c:#C9453F"><i class="ti ti-shield-lock"></i></div><div><h2>Admin Dashboard</h2><p>Manage corrections & claims</p></div></div>
+  <div class="admin-tab">
+    <button class="active" id="tabClaims">Profile Claims</button>
+    <button id="tabCorrections">Corrections</button>
+  </div>
+  <div id="adminList"></div>
+</section>
+<!-- Auth Modal -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="mclose" id="authClose"><i class="ti ti-x"></i></button>
+    <h3 id="authTitle">Sign Up</h3>
+    <p class="msub" id="authSub">Create an account to suggest edits</p>
+    <form id="authForm">
+      <div class="field"><label>Email</label><input type="email" id="authEmail" required placeholder="your@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="authPass" required placeholder="Min 6 characters" minlength="6"></div>
+      <div class="field" id="authGemField" style="display:none"><label>Group Gematria (3 digits)</label><span class="gem-hint">What is Klal Yisrael waiting for?</span><div class="gem-boxes"><input type="text" maxlength="1" pattern="\d*" inputmode="numeric" class="gem-box" autocomplete="off"><input type="text" maxlength="1" pattern="\d*" inputmode="numeric" class="gem-box" autocomplete="off"><input type="text" maxlength="1" pattern="\d*" inputmode="numeric" class="gem-box" autocomplete="off"></div></div>
+      <button type="submit" class="mbtn" id="authBtn">Create Account</button>
+      <div class="merr" id="authErr"></div>
+    </form>
+    <div class="mswitch" id="authSwitch">Already have an account? <a id="authToggle">Sign In</a></div>
+  </div>
+</div>
+<!-- Correction Modal -->
+<div class="modal-overlay" id="correctModal">
+  <div class="modal">
+    <button class="mclose" id="correctClose"><i class="ti ti-x"></i></button>
+    <h3>Suggest Correction</h3>
+    <p class="msub">Help us keep information accurate</p>
+    <p style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:16px" id="correctTarget"></p>
+    <div class="field"><label>What needs fixing?</label><textarea id="correctNotes" placeholder="Describe what's incorrect or outdated..." required></textarea></div>
+    <button class="mbtn" id="correctSubmit"><i class="ti ti-send"></i> Submit Correction</button>
+    <div class="merr" id="correctErr"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="masterEditModal">
+  <div class="modal">
+    <button class="mclose" id="masterEditClose"><i class="ti ti-x"></i></button>
+    <h3><i class="ti ti-shield-lock" style="color:#C9453F;margin-right:6px"></i>Master Edit</h3>
+    <p class="msub">Admin override — changes apply immediately</p>
+    <div class="field"><label>Name</label><input type="text" id="meditName" placeholder="Contact name"></div>
+    <div class="field"><label>Trade / Category</label><input type="text" id="meditCategory" placeholder="e.g. Plumbing"></div>
+    <div class="field"><label>Bio</label><textarea id="meditBio" placeholder="Short description..." rows="3"></textarea></div>
+    <div class="field"><label>Tags (comma-separated)</label><input type="text" id="meditTags" placeholder="e.g. reliable, fast, kosher"></div>
+    <button class="mbtn" id="masterEditSubmit" style="background:#C9453F"><i class="ti ti-device-floppy"></i> Save Override</button>
+    <div class="merr" id="masterEditErr"></div>
+  </div>
+</div>
+<script>
+const ICONS={"Real Estate":"ti-home","Legal":"ti-gavel","Construction / Contractor":"ti-backhoe","Landscaping / Lawn / Snow":"ti-plant-2","Plumbing":"ti-droplet","HVAC / Heating & AC":"ti-air-conditioning","Insurance":"ti-shield-half","Appliance Repair":"ti-wash-machine","Electrical":"ti-bolt","Accounting / Tax":"ti-calculator","IT / Computer / Web":"ti-device-laptop","Cleaning":"ti-spray","Printing / Signs / Promo":"ti-printer","Photography / Video":"ti-camera","Flooring":"ti-layout-grid","Catering / Food / Chef":"ti-tools-kitchen-2","Handyman":"ti-tool","Roofing / Gutters":"ti-home-2","Religious Services":"ti-star","Moving / Storage":"ti-truck-delivery","Medical / Dental / Therapy":"ti-stethoscope","Pest Control":"ti-bug","Auto Repair / Mechanic":"ti-car","Painting":"ti-paint","Graphic / Logo Design":"ti-palette","Mortgage":"ti-building-bank","Marketing / Social":"ti-speakerphone","Tires":"ti-disc","Towing / Roadside":"ti-truck","Locksmith":"ti-key","Auto Body / Glass":"ti-car-crash"};
+const FG=["#D2552C","#3E8E4F","#3B6FC4","#A4499A","#C98A1E","#2A8C86","#C9453F","#6A52C7","#7C8A2E"];
+const col=c=>FG[[...(c||'')].reduce((a,ch)=>a+ch.charCodeAt(0),0)%FG.length];
+const ico=c=>`<i class="ti ${ICONS[c]||'ti-point'}"></i>`;
+const initials=n=>(n||'?').replace(/[^a-zA-Z ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
+let DATA=null,LIST=[];
+
+/* theme */
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('tgl').innerHTML=`<i class="ti ti-${t==='dark'?'sun':'moon'}"></i>`;const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#171310':'#FBF4EC')}
+applyTheme(localStorage.getItem('sb-theme')||'light');
+document.getElementById('tgl').onclick=()=>{const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';localStorage.setItem('sb-theme',n);applyTheme(n)};
+
+/* ---- passcode unlock + AES-GCM decrypt (Web Crypto) ---- */
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let ENC=null;
+fetch('app_data.enc').then(r=>r.json()).then(e=>{ENC=e;
+  const saved=sessionStorage.getItem('sb-pass');
+  if(saved) tryUnlock(saved,true);
+});
+async function decrypt(pass){
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt:b64(ENC.salt),iterations:ENC.iter,hash:'SHA-256'},
+    km,{name:'AES-GCM',length:256},false,['decrypt']);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(ENC.iv)},key,b64(ENC.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function tryUnlock(pass,silent){
+  const btn=document.getElementById('lbtn'),err=document.getElementById('lerr');
+  if(!silent){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2"></i> Unlocking…';}
+  try{
+    DATA=await decrypt(pass);
+    sessionStorage.setItem('sb-pass',pass);
+    document.getElementById('lock').style.display='none';
+    buildSearchIndex();
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+    if(window._onDataReady) window._onDataReady();
+  }catch(e){
+    if(!silent){err.textContent='Not quite. Try again.';btn.disabled=false;btn.innerHTML='<i class="ti ti-lock-open"></i> Enter';clearBoxes();}
+    else sessionStorage.removeItem('sb-pass');
+  }
+}
+const boxes=[...document.querySelectorAll('.dbox')];
+const gematria=()=>boxes.map(b=>b.value).join('');
+function clearBoxes(){boxes.forEach(b=>b.value='');boxes[0].focus();}
+boxes.forEach((b,i)=>{
+  b.addEventListener('input',()=>{b.value=b.value.replace(/[^0-9]/g,'').slice(0,1);if(b.value&&i<2)boxes[i+1].focus();if(gematria().length===3)tryUnlock(gematria(),false);});
+  b.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!b.value&&i>0)boxes[i-1].focus();});
+});
+document.getElementById('lform').addEventListener('submit',ev=>{ev.preventDefault();const v=gematria();if(v.length===3)tryUnlock(v,false);});
+boxes[0].focus();
+
+function home(){
+  const s=DATA.stats;
+  document.getElementById('stats').innerHTML=`<div class="stat"><b>${s.listed.toLocaleString()}</b><span>RECOMMENDED</span></div><div class="stat"><b>${s.categories}</b><span>TRADES</span></div><div class="stat"><b>8 yrs</b><span>OF CHAT</span></div>`;
+  document.getElementById('trc').textContent=`${DATA.categories.length} trades`;
+  document.getElementById('uvCt').textContent=`${s.unverified.toLocaleString()} contacts`;
+  document.getElementById('cats').innerHTML=DATA.categories.map((c,i)=>`<button class="cat" data-i="${i}"><div class="ic" style="--c:${col(c.name)}">${ico(c.name)}</div><div><div class="nm">${c.name}</div><div class="ct">${c.count} ${c.count===1?'person':'people'}</div></div></button>`).join('');
+  document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>openCat(DATA.categories[b.dataset.i]));
+  document.getElementById('uvBtn').onclick=openUnverified;
+}
+function setHead(cat,title,sub){const ih=document.getElementById('dIco');ih.style.setProperty('--c',col(cat));ih.innerHTML=ico(cat);document.getElementById('dTitle').textContent=title;document.getElementById('dSub').textContent=sub}
+function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'people'}`);renderList(c.contacts,c.name,false);show('detail')}
+function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class="ti ti-help-circle"></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);show('detail')}
+function renderList(arr,cat,uv){
+  LIST=arr;
+  document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,cat||p.category,uv)).join('');
+  document.querySelectorAll('#dList .row').forEach(r=>r.onclick=e=>{if(e.target.closest('.call'))return;openProfile(LIST[+r.dataset.idx])});
+}
+function row(p,rk,cat,uv){
+  const medal=rk<=3&&!uv?['🥇','🥈','🥉'][rk-1]:'';
+  const asks=(p.asks||[]).slice(0,3).map(a=>`<span class="ask">${esc(a)}</span>`).join('');
+  const bd=p.confidence==='high'?'<span class="bd c"><i class="ti ti-rosette-discount-check" style="font-size:12px"></i>Confirmed</span>':'<span class="bd l">Likely</span>';
+  const tel=p.phone?`<a class="call" href="tel:${p.phone}"><i class="ti ti-phone"></i>Call</a>`:'';
+  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(p.name)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(p.name)}</span>${bd}</div><div class="rm"><b>${p.vouchers}</b> vouched${p.last?' · '+p.last.slice(0,4):''}</div>${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
+}
+function openProfile(p){
+  window._currentViewedContact=p;
+  const displayName=p._override_name||p.name;
+  const displayCategory=p._override_category||p.category;
+  const c=col(displayCategory);
+  const av=document.getElementById('pAv');av.style.setProperty('--c',c);av.textContent=initials(displayName);
+  document.getElementById('pName').textContent=displayName;
+  const pc=document.getElementById('pCat');pc.style.setProperty('--c',c);pc.innerHTML=`${ico(displayCategory)}<span>${esc(displayCategory)}</span>`;
+  const yrs=p.first&&p.last?(p.first.slice(0,4)===p.last.slice(0,4)?p.first.slice(0,4):p.first.slice(0,4)+'–'+p.last.slice(0,4)):'—';
+  document.getElementById('pStats').innerHTML=`<div class="ps"><b>${p.vouchers}</b><span>VOUCHES</span></div><div class="ps"><b>${p.mentions}</b><span>MENTIONS</span></div><div class="ps"><b>${yrs}</b><span>ACTIVE</span></div>`;
+  const call=document.getElementById('pCall');if(p.phone){call.style.display='flex';call.href='tel:'+p.phone;call.querySelector('span').textContent='Call '+p.phone_fmt}else call.style.display='none';
+  const recs=p._override_tags?p._override_tags.split(',').map(s=>s.trim()).filter(Boolean):(p.asks||[]);
+  document.getElementById('pRecWrap').style.display=recs.length?'block':'none';
+  document.getElementById('pRec').innerHTML=recs.map(a=>`<span class="ask">${esc(a)}</span>`).join('');
+  // conversation threads — who asked, what they asked, who answered
+  const threads=(p.threads||[]);
+  document.getElementById('pThreadWrap').style.display=threads.length?'block':'none';
+  document.getElementById('pThreads').innerHTML=threads.map(t=>{
+    const said=t.said&&!/^Shared their contact/i.test(t.said)?` “${esc(t.said)}”`:' shared the contact';
+    return `<div class="thread" style="--c:${c}">
+      <div class="qh"><span class="who">${esc(t.asker||'A member')} asked</span><span class="dt">${esc(t.date)}</span></div>
+      <div class="qt">${esc(t.question)}</div>
+      <div class="ans"><i class="ti ti-arrow-back-up"></i><span><b>${esc(t.by)}</b>${said}</span></div></div>`;
+  }).join('');
+  // other trades this person shows up under (skip the primary, already shown as the badge)
+  const others=(p.trades||[]).filter(t=>t.category!==p.category);
+  document.getElementById('pTradeWrap').style.display=others.length?'block':'none';
+  document.getElementById('pTrades').innerHTML=others.map(t=>{const tc=col(t.category);return `<div class="trade"><div class="th"><div class="ti0 ic" style="--c:${tc}">${ico(t.category)}</div><div class="tn">${esc(t.category)}</div><div class="tv">${t.vouchers} vouch${t.vouchers>1?'es':''}</div></div>${t.evidence?`<div class="tq">${esc(t.evidence)}</div>`:''}</div>`}).join('');
+  document.getElementById('pActions').style.display='flex';
+  document.getElementById('masterEditBtn').style.display=(window.userProfile&&window.userProfile.role==='admin')?'flex':'none';
+  show('profile');
+}
+/* --- Smart Search Index & Fuzzy Multi-Token Matching --- */
+let SEARCH_INDEX=[];
+function buildSearchIndex(){
+  SEARCH_INDEX=[];
+  if(!DATA) return;
+  DATA.categories.forEach(c=>c.contacts.forEach(p=>{
+    const parts=[
+      p.name||'',
+      c.name||'',
+      p.category||'',
+      (p.asks||[]).join(' '),
+      (p.threads||[]).map(t=>[t.question||'',t.said||'',t.asker||'',t.by||''].join(' ')).join(' '),
+      (p.trades||[]).map(t=>[t.category||'',t.evidence||''].join(' ')).join(' ')
+    ];
+    SEARCH_INDEX.push({person:p,text:parts.join(' ').toLowerCase()});
+  }));
+  if(DATA.unverified) DATA.unverified.forEach(p=>{
+    const parts=[
+      p.name||'',
+      p.category||'',
+      (p.asks||[]).join(' '),
+      (p.threads||[]).map(t=>[t.question||'',t.said||'',t.asker||'',t.by||''].join(' ')).join(' '),
+      (p.trades||[]).map(t=>[t.category||'',t.evidence||''].join(' ')).join(' ')
+    ];
+    SEARCH_INDEX.push({person:p,text:parts.join(' ').toLowerCase()});
+  });
+}
+async function loadOverrides(){
+  if(!DATA)return;
+  const{data}=await supabase.from('contact_overrides').select('*');
+  if(!data||!data.length)return;
+  const map=Object.create(null);
+  data.forEach(o=>{map[o.contact_name]=o;});
+  const apply=p=>{
+    const o=map[p.name];
+    if(!o)return;
+    if(o.override_name)p._override_name=o.override_name;
+    if(o.override_category)p._override_category=o.override_category;
+    if(o.override_bio)p._override_bio=o.override_bio;
+    if(o.override_tags)p._override_tags=o.override_tags;
+  };
+  DATA.categories.forEach(c=>c.contacts.forEach(apply));
+  if(DATA.unverified)DATA.unverified.forEach(apply);
+}
+function fuzzyMatch(tokens,text){
+  let score=0;
+  for(let i=0;i<tokens.length;i++){
+    const tk=tokens[i];
+    if(text.includes(tk)){score+=1;continue;}
+    let found=false;
+    const words=text.split(/\s+/);
+    for(let j=0;j<words.length;j++){
+      if(words[j].length>=3&&tk.length>=3&&levenshtein(tk,words[j])<=Math.floor(tk.length/3)){found=true;break;}
+    }
+    if(found){score+=0.6;}else{return 0;}
+  }
+  return score;
+}
+function levenshtein(a,b){
+  if(a.length>b.length){const t=a;a=b;b=t;}
+  const row=Array.from({length:a.length+1},(_,i)=>i);
+  for(let i=1;i<=b.length;i++){
+    let prev=i;
+    for(let j=1;j<=a.length;j++){
+      const val=b[i-1]===a[j-1]?row[j-1]:Math.min(row[j-1],prev,row[j])+1;
+      row[j-1]=prev;prev=val;
+    }
+    row[a.length]=prev;
+  }
+  return row[a.length];
+}
+document.getElementById('q').addEventListener('input',e=>{const raw=e.target.value.trim();const t=raw.toLowerCase();if(!t){show('home');return}if(!SEARCH_INDEX.length)buildSearchIndex();const tokens=t.split(/\s+/).filter(Boolean);const scored=[];for(let i=0;i<SEARCH_INDEX.length;i++){const entry=SEARCH_INDEX[i];const s=fuzzyMatch(tokens,entry.text);if(s>0)scored.push({person:entry.person,score:s});}scored.sort((a,b)=>b.score-a.score||(b.person.score||0)-(a.person.score||0));const hits=scored.map(s=>s.person);const ih=document.getElementById('dIco');ih.style.setProperty('--c','#D2552C');ih.innerHTML='<i class=”ti ti-search”></i>';document.getElementById('dTitle').textContent='”'+raw+'”';document.getElementById('dSub').textContent=hits.length+' matches';if(hits.length)renderList(hits.slice(0,80),null,false);else document.getElementById('dList').innerHTML='<div class=”empty”>No matches yet.</div>';show('detail')});
+document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
+document.querySelector('header .logo').onclick=()=>{document.getElementById('q').value='';show('home');home()};
+document.getElementById('pback').onclick=()=>show('detail');
+function show(v){['home','detail','profile','settings','admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===v?'block':'none'});scrollTo(0,0)}
+const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+const SUPA_URL='https://slxqrjfuibaqyhqkhvyh.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNseHFyamZ1aWJhcXlocWtodnloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NDI2NzYsImV4cCI6MjA5ODMxODY3Nn0.2xeBw2BEJw0n9WA6CugeUY751yr8EMvYDjG86cTPrVw';
+const supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+
+let currentUser=null;
+let userProfile=null;
+
+async function initAuth(){
+  const{data:{session}}=await supabase.auth.getSession();
+  if(session) await setUser(session.user);
+}
+
+async function setUser(user){
+  currentUser=user;
+  const{data}=await supabase.from('user_profiles').select('*').eq('id',user.id).maybeSingle();
+  userProfile=data;
+  window.userProfile=userProfile;
+  if(userProfile&&userProfile.preferred_theme){
+    applyTheme(userProfile.preferred_theme);
+    localStorage.setItem('sb-theme',userProfile.preferred_theme);
+  }
+  updateUserBtn();
+}
+
+function updateUserBtn(){
+  const btn=document.getElementById('userBtn');
+  if(currentUser){
+    btn.innerHTML='<i class="ti ti-user-check"></i>';
+    btn.style.borderColor='var(--brand)';
+    btn.style.color='var(--brand)';
+  }else{
+    btn.innerHTML='<i class="ti ti-user"></i>';
+    btn.style.borderColor='';
+    btn.style.color='';
+  }
+}
+
+// --- Auth Modal ---
+const authModal=document.getElementById('authModal');
+const authForm=document.getElementById('authForm');
+let authMode='signup';
+let authMandatory=false;
+
+document.getElementById('userBtn').onclick=()=>{
+  if(currentUser){
+    showSettings();
+  }else{
+    authMandatory=false;
+    setAuthMode('signup');
+    authModal.classList.add('active');
+    document.getElementById('authClose').style.display='';
+  }
+};
+document.getElementById('authClose').onclick=()=>{if(!authMandatory)authModal.classList.remove('active')};
+authModal.onclick=e=>{if(e.target===authModal&&!authMandatory)authModal.classList.remove('active')};
+
+window._showMandatoryAuth=function(){
+  authMandatory=true;
+  setAuthMode('signup');
+  authModal.classList.add('active');
+  document.getElementById('authClose').style.display='none';
+};
+
+document.getElementById('authToggle').onclick=()=>{
+  setAuthMode(authMode==='signup'?'login':'signup');
+};
+
+function setAuthMode(mode){
+  authMode=mode;
+  document.getElementById('authTitle').textContent=mode==='signup'?'Sign Up':'Sign In';
+  document.getElementById('authSub').textContent=mode==='signup'?'Create an account to suggest edits':'Welcome back';
+  document.getElementById('authBtn').textContent=mode==='signup'?'Create Account':'Sign In';
+  document.getElementById('authSwitch').innerHTML=mode==='signup'?'Already have an account? <a id="authToggle">Sign In</a>':'Need an account? <a id="authToggle">Sign Up</a>';
+  document.getElementById('authGemField').style.display=mode==='signup'?'block':'none';
+  document.getElementById('authErr').textContent='';
+  document.getElementById('authToggle').onclick=()=>setAuthMode(mode==='signup'?'login':'signup');
+}
+
+// Gem-box auto-focus
+document.querySelectorAll('.gem-box').forEach((box,i,all)=>{
+  box.addEventListener('input',()=>{box.value=box.value.replace(/[^0-9]/g,'').slice(0,1);if(box.value&&i<2)all[i+1].focus();});
+  box.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!box.value&&i>0)all[i-1].focus();});
+});
+
+authForm.onsubmit=async e=>{
+  e.preventDefault();
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  const err=document.getElementById('authErr');
+  const btn=document.getElementById('authBtn');
+  err.textContent='';
+  btn.disabled=true;
+
+  if(authMode==='signup'){
+    const gemBoxes=document.querySelectorAll('.gem-box');
+    const gem=(gemBoxes[0].value+gemBoxes[1].value+gemBoxes[2].value).trim();
+    if(gem.length!==3){err.textContent='Please enter the 3-digit gematria.';btn.disabled=false;return;}
+    try{
+      await decrypt(gem);
+    }catch(ex){
+      err.textContent='Incorrect gematria. You must know the group code to sign up.';
+      btn.disabled=false;return;
+    }
+    const{data,error}=await supabase.auth.signUp({email,password:pass});
+    if(error){err.textContent=error.message;btn.disabled=false;return;}
+    await supabase.from('user_profiles').insert({id:data.user.id,role:'user',preferred_theme:localStorage.getItem('sb-theme')||'light'});
+    await setUser(data.user);
+    localStorage.setItem('has_seen_trainer','true');
+    authMandatory=false;
+    authModal.classList.remove('active');
+    if(DATA) enterApp();
+  }else{
+    const{data,error}=await supabase.auth.signInWithPassword({email,password:pass});
+    if(error){err.textContent=error.message;btn.disabled=false;return;}
+    await setUser(data.user);
+    localStorage.setItem('has_seen_trainer','true');
+    authMandatory=false;
+    authModal.classList.remove('active');
+    if(DATA) enterApp();
+  }
+  btn.disabled=false;
+  authForm.reset();
+};
+
+// --- Settings ---
+function showSettings(){
+  document.getElementById('setEmail').textContent=currentUser?.email||'Unknown';
+  const sw=document.getElementById('themeToggleSw');
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  sw.classList.toggle('on',isDark);
+  sw.onclick=async()=>{
+    const newTheme=sw.classList.contains('on')?'light':'dark';
+    sw.classList.toggle('on',newTheme==='dark');
+    applyTheme(newTheme);
+    localStorage.setItem('sb-theme',newTheme);
+    if(currentUser){
+      await supabase.from('user_profiles').update({preferred_theme:newTheme}).eq('id',currentUser.id);
+    }
+  };
+  document.getElementById('adminCard').style.display=(userProfile&&userProfile.role==='admin')?'block':'none';
+  show('settings');
+}
+document.getElementById('setBack').onclick=()=>show('home');
+document.getElementById('goAdminBtn').onclick=()=>{show('admin');loadAdmin()};
+document.getElementById('logoutBtn').onclick=async()=>{
+  await supabase.auth.signOut();
+  currentUser=null;userProfile=null;window.userProfile=null;
+  updateUserBtn();
+  show('home');
+};
+
+// --- Correct & Share ---
+const correctModal=document.getElementById('correctModal');
+document.getElementById('correctClose').onclick=()=>correctModal.classList.remove('active');
+correctModal.onclick=e=>{if(e.target===correctModal)correctModal.classList.remove('active')};
+
+document.getElementById('correctBtn').onclick=()=>{
+  if(!currentUser){setAuthMode('signup');authModal.classList.add('active');return;}
+  document.getElementById('correctTarget').textContent='Contact: '+window._currentViewedContact.name;
+  document.getElementById('correctErr').textContent='';
+  document.getElementById('correctNotes').value='';
+  correctModal.classList.add('active');
+};
+
+document.getElementById('shareBtn').onclick=async()=>{
+  const name=(window._currentViewedContact&&window._currentViewedContact.name)||'this contact';
+  const shareData={
+    title:'Strictly Business Directory',
+    text:'Hey! You were highly recommended in the Strictly Business private directory. Check out your profile here:',
+    url:window.location.origin
+  };
+  if(navigator.share){
+    try{await navigator.share(shareData);}catch(e){}
+  }else{
+    try{await navigator.clipboard.writeText(shareData.text+' '+shareData.url);alert('Link copied to clipboard!');}
+    catch(e){alert(shareData.text+' '+shareData.url);}
+  }
+};
+
+document.getElementById('correctSubmit').onclick=async()=>{
+  const notes=document.getElementById('correctNotes').value.trim();
+  if(!notes){document.getElementById('correctErr').textContent='Please describe what needs fixing.';return;}
+  const btn=document.getElementById('correctSubmit');
+  btn.disabled=true;
+  const{error}=await supabase.from('correction_requests').insert({
+    user_id:currentUser.id,
+    requester_email:currentUser.email||null,
+    contact_name:window._currentViewedContact.name,
+    contact_category:window._currentViewedContact.category||null,
+    notes
+  });
+  if(error){document.getElementById('correctErr').textContent=error.message;btn.disabled=false;return;}
+  btn.disabled=false;
+  correctModal.classList.remove('active');
+  alert('Correction submitted! An admin will review it.');
+};
+
+// --- Admin Dashboard ---
+document.getElementById('adminBack').onclick=()=>show('home');
+
+let adminTab='claims';
+document.getElementById('tabClaims').onclick=()=>{adminTab='claims';updateAdminTabs();loadAdmin()};
+document.getElementById('tabCorrections').onclick=()=>{adminTab='corrections';updateAdminTabs();loadAdmin()};
+function updateAdminTabs(){
+  document.getElementById('tabClaims').classList.toggle('active',adminTab==='claims');
+  document.getElementById('tabCorrections').classList.toggle('active',adminTab==='corrections');
+}
+
+function findPhoneByName(name){
+  if(!DATA)return'';
+  const n=name.toLowerCase();
+  for(const cat of DATA.categories){
+    const p=cat.contacts.find(c=>(c.name||'').toLowerCase()===n);
+    if(p&&p.phone)return p.phone;
+  }
+  if(DATA.unverified){
+    const p=DATA.unverified.find(c=>(c.name||'').toLowerCase()===n);
+    if(p&&p.phone)return p.phone;
+  }
+  return'';
+}
+
+async function loadAdmin(){
+  if(!userProfile||userProfile.role!=='admin'){show('home');return;}
+  const list=document.getElementById('adminList');
+  list.innerHTML='<div class="empty">Loading...</div>';
+  if(adminTab==='claims'){
+    const{data,error}=await supabase.from('profile_claims').select('*').order('created_at',{ascending:false});
+    if(error||!data){list.innerHTML='<div class="empty">Error loading claims</div>';return;}
+    if(!data.length){list.innerHTML='<div class="empty">No claims yet</div>';return;}
+    list.innerHTML=data.map(c=>{
+      const dt=new Date(c.created_at).toLocaleDateString();
+      const email=c.requester_email?`<div class="ai-email">${esc(c.requester_email)}</div>`:'';
+      const del=`<button class="del-rec" onclick="deleteRequestRecord('profile_claims','${c.id}')"><i class="ti ti-trash"></i></button>`;
+      if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-top"><span class="ai-status ${c.status}">${c.status}</span>${del}</div></div>`;
+      const vNote=c.verification_notes?`<div class="ai-note" style="font-style:italic;color:var(--brand)"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:middle;margin-right:4px"></i>${esc(c.verification_notes)}</div>`:'';
+      const phone=findPhoneByName(c.target_contact_name);
+      const smsBody=encodeURIComponent('Strictly Business Admin: Did you request to claim your directory profile using the email '+(c.requester_email||'unknown')+'? Reply YES to confirm.');
+      const sms=phone?`<a class="sms-verify" href="sms:${phone}?&body=${smsBody}"><i class="ti ti-message-forward"></i> Verify via SMS</a>`:'';
+      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}${vNote}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button>${sms}${del}</div></div>`;
+    }).join('');
+  }else{
+    const{data,error}=await supabase.from('correction_requests').select('*').order('created_at',{ascending:false});
+    if(error||!data){list.innerHTML='<div class="empty">Error loading corrections</div>';return;}
+    if(!data.length){list.innerHTML='<div class="empty">No corrections yet</div>';return;}
+    list.innerHTML=data.map(c=>{
+      const dt=new Date(c.created_at).toLocaleDateString();
+      const email=c.requester_email?`<div class="ai-email">${esc(c.requester_email)}</div>`:'';
+      const del=`<button class="del-rec" onclick="deleteRequestRecord('correction_requests','${c.id}')"><i class="ti ti-trash"></i></button>`;
+      if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">${esc(c.notes)}</div><div class="ai-top"><span class="ai-status ${c.status}">${c.status}</span>${del}</div></div>`;
+      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">${esc(c.notes)}</div><div class="ai-actions"><button class="approve" onclick="adminAction('correction_requests','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('correction_requests','${c.id}','rejected')">Reject</button>${del}</div></div>`;
+    }).join('');
+  }
+}
+
+window.adminAction=async function(table,id,status){
+  await supabase.from(table).update({status,reviewed_at:new Date().toISOString()}).eq('id',id);
+  loadAdmin();
+};
+
+window.deleteRequestRecord=async function(table,id){
+  if(!confirm('Are you sure you want to delete this record from the history?'))return;
+  const{error}=await supabase.from(table).delete().eq('id',id);
+  if(error){alert('Delete failed: '+error.message);return;}
+  loadAdmin();
+};
+
+// --- Master Edit Modal ---
+const masterEditModal=document.getElementById('masterEditModal');
+document.getElementById('masterEditClose').onclick=()=>masterEditModal.classList.remove('active');
+masterEditModal.onclick=e=>{if(e.target===masterEditModal)masterEditModal.classList.remove('active')};
+
+document.getElementById('masterEditBtn').onclick=()=>{
+  if(!userProfile||userProfile.role!=='admin')return;
+  const p=window._currentViewedContact;
+  if(!p)return;
+  document.getElementById('meditName').value=p.name||'';
+  document.getElementById('meditCategory').value=p.category||'';
+  document.getElementById('meditBio').value=p.bio||'';
+  document.getElementById('meditTags').value=(p.asks||[]).join(', ');
+  document.getElementById('masterEditErr').textContent='';
+  masterEditModal.classList.add('active');
+};
+
+document.getElementById('masterEditSubmit').onclick=async()=>{
+  const p=window._currentViewedContact;
+  if(!p)return;
+  const btn=document.getElementById('masterEditSubmit');
+  const err=document.getElementById('masterEditErr');
+  btn.disabled=true;err.textContent='';
+  const payload={
+    contact_name:p.name,
+    override_name:document.getElementById('meditName').value.trim()||null,
+    override_category:document.getElementById('meditCategory').value.trim()||null,
+    override_bio:document.getElementById('meditBio').value.trim()||null,
+    override_tags:document.getElementById('meditTags').value.trim()||null,
+    updated_by:currentUser.id,
+    updated_at:new Date().toISOString()
+  };
+  const{error}=await supabase.from('contact_overrides').upsert(payload,{onConflict:'contact_name'});
+  btn.disabled=false;
+  if(error){err.textContent='Error: '+error.message;return;}
+  masterEditModal.classList.remove('active');
+  if(payload.override_name)p._override_name=payload.override_name;
+  if(payload.override_category)p._override_category=payload.override_category;
+  if(payload.override_bio)p._override_bio=payload.override_bio;
+  if(payload.override_tags)p._override_tags=payload.override_tags;
+  openProfile(p);
+};
+
+// Admin route check
+function checkAdminRoute(){
+  if(window.location.hash==='#/admin'&&userProfile&&userProfile.role==='admin'){
+    show('admin');loadAdmin();
+  }
+}
+window.addEventListener('hashchange',checkAdminRoute);
+
+// Init
+function enterApp(){
+  if(!DATA) return;
+  home();
+  loadOverrides();
+  checkAdminRoute();
+}
+
+function gateUnauthenticated(){
+  if(!DATA) return;
+  if(!localStorage.getItem('has_seen_trainer')&&window._openTrainer){
+    setTimeout(window._openTrainer,300);
+  }else{
+    if(window._showMandatoryAuth) window._showMandatoryAuth();
+  }
+}
+
+window._onDataReady=function(){
+  if(currentUser){enterApp();}
+  else{gateUnauthenticated();}
+};
+
+initAuth().then(()=>{
+  if(DATA){
+    if(currentUser){enterApp();}
+    else{gateUnauthenticated();}
+  }
+});
+
+supabase.auth.onAuthStateChange(async(event,session)=>{
+  if(event==='SIGNED_IN'&&session){
+    await setUser(session.user);
+    if(DATA){enterApp();}
+  }else if(event==='SIGNED_OUT'){
+    currentUser=null;userProfile=null;window.userProfile=null;updateUserBtn();
+  }
+});
+})();
+</script>
+<div id="pwa-banner" role="dialog" aria-label="Install app">
+  <div class="pwa-top">
+    <div class="pwa-icon"><img src="icon-192.png" alt=""></div>
+    <div class="pwa-copy">
+      <strong>Add to your home screen</strong>
+      <span>Get quick access — no App Store needed</span>
+    </div>
+    <button class="pwa-close" id="pwa-close" aria-label="Dismiss"><i class="ti ti-x"></i></button>
+  </div>
+  <div id="pwa-native" style="display:none">
+    <div class="pwa-actions">
+      <button id="pwa-btn"><i class="ti ti-download"></i> Add to Home Screen</button>
+    </div>
+  </div>
+  <div id="pwa-ios" style="display:none">
+    <div class="pwa-ios-steps">Tap <b>Share <i class="ti ti-share" style="font-size:13px;vertical-align:middle"></i></b> at the bottom of your browser, then choose <b>"Add to Home Screen"</b> and tap <b>Add</b>.
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  if(localStorage.getItem('pwa-dismissed')) return;
+  let deferredPrompt=null;
+  const banner=document.getElementById('pwa-banner');
+  const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  if(isInStandalone) return;
+  function showBanner(){
+    if(isIos){document.getElementById('pwa-ios').style.display='block';}
+    else{document.getElementById('pwa-native').style.display='block';}
+    setTimeout(()=>banner.classList.add('show'),600);
+  }
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferredPrompt=e;
+    showBanner();
+  });
+  if(isIos) showBanner();
+  document.getElementById('pwa-btn').onclick=async()=>{
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const{outcome}=await deferredPrompt.userChoice;
+    deferredPrompt=null;
+    banner.classList.remove('show');
+    if(outcome==='accepted') localStorage.setItem('pwa-dismissed','1');
+  };
+  document.getElementById('pwa-close').onclick=()=>{
+    banner.classList.remove('show');
+    localStorage.setItem('pwa-dismissed','1');
+  };
+})();
+</script>
+<!-- Trainer Tutorial Modal -->
+<div id="trainer-overlay">
+  <div id="trainer-modal">
+    <button class="tr-skip" id="trSkip" aria-label="Skip tutorial"><i class="ti ti-x"></i></button>
+    <div class="tr-icon"><i class="ti ti-compass"></i></div>
+    <div class="tr-text" id="trText"></div>
+    <div class="tr-dots" id="trDots"></div>
+    <button class="tr-next" id="trNext">Next</button>
+  </div>
+</div>
+<script>
+(function(){
+  const STEPS=[
+    "Welcome to Strictly Business. Let\u2019s walk through how to use the directory.",
+    "Smart Search: Type a name, a trade, or even a keyword like \u2018basement flood\u2019 to find the exact right person based on chat history.",
+    "Profile & Evidence: Click any card to see a contact\u2019s full profile, who recommended them, and the exact chat thread where they were vouched for.",
+    "Community Driven: Use the Settings or Profile buttons to suggest corrections and keep the directory accurate."
+  ];
+  const ICONS=["ti-compass","ti-search","ti-user-search","ti-users-group"];
+  let step=0;
+  const overlay=document.getElementById('trainer-overlay');
+  const textEl=document.getElementById('trText');
+  const dotsEl=document.getElementById('trDots');
+  const nextBtn=document.getElementById('trNext');
+  const iconEl=overlay.querySelector('.tr-icon i');
+
+  function renderStep(){
+    textEl.textContent=STEPS[step];
+    iconEl.className='ti '+ICONS[step];
+    dotsEl.innerHTML=STEPS.map((_,i)=>'<div class="tr-dot'+(i===step?' active':'')+'"></div>').join('');
+    nextBtn.textContent=step===STEPS.length-1?'Done':'Next';
+  }
+
+  function openTrainer(){
+    step=0;renderStep();
+    overlay.classList.add('active');
+  }
+
+  function closeTrainer(){
+    overlay.classList.remove('active');
+    if(window._showMandatoryAuth) window._showMandatoryAuth();
+  }
+
+  nextBtn.onclick=()=>{
+    if(step<STEPS.length-1){step++;renderStep();}
+    else closeTrainer();
+  };
+  document.getElementById('trSkip').onclick=closeTrainer;
+
+  window._openTrainer=openTrainer;
+
+  document.getElementById('replayTutorial').onclick=()=>{
+    show('home');
+    setTimeout(openTrainer,200);
+  };
+})();
+</script>
+</body></html>
