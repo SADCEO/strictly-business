@@ -565,7 +565,7 @@ let userProfile=null;
 
 async function initAuth(){
   const{data:{session}}=await supabase.auth.getSession();
-  if(session&&session.user) await setUser(session.user);
+  if(session) await setUser(session.user);
 }
 
 async function setUser(user){
@@ -852,15 +852,12 @@ document.getElementById('masterEditSubmit').onclick=async()=>{
     override_category:document.getElementById('meditCategory').value.trim()||null,
     override_bio:document.getElementById('meditBio').value.trim()||null,
     override_tags:document.getElementById('meditTags').value.trim()||null,
-    updated_by:currentUser.id
+    updated_by:currentUser.id,
+    updated_at:new Date().toISOString()
   };
   const{error}=await supabase.from('contact_overrides').upsert(payload,{onConflict:'contact_name'});
   btn.disabled=false;
-  if(error){
-    err.textContent='Failed to save: '+error.message;
-    alert('Failed to save: '+error.message);
-    return;
-  }
+  if(error){err.textContent='Error: '+error.message;return;}
   masterEditModal.classList.remove('active');
   if(payload.override_name)p._override_name=payload.override_name;
   if(payload.override_category)p._override_category=payload.override_category;
@@ -895,15 +892,11 @@ function gateUnauthenticated(){
 }
 
 window._onDataReady=function(){
-  if(_authReady){
-    if(currentUser){enterApp();}
-    else{gateUnauthenticated();}
-  }
+  if(currentUser){enterApp();}
+  else{gateUnauthenticated();}
 };
 
-let _authReady=false;
 initAuth().then(()=>{
-  _authReady=true;
   if(DATA){
     if(currentUser){enterApp();}
     else{gateUnauthenticated();}
@@ -911,7 +904,7 @@ initAuth().then(()=>{
 });
 
 supabase.auth.onAuthStateChange(async(event,session)=>{
-  if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&session&&session.user){
+  if(event==='SIGNED_IN'&&session){
     await setUser(session.user);
     if(DATA){enterApp();}
   }else if(event==='SIGNED_OUT'){
