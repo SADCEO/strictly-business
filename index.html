@@ -167,13 +167,14 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .modal textarea{height:100px;padding:12px 14px;resize:vertical}
 .modal input:focus,.modal textarea:focus{border-color:var(--brand)}
 .modal .field{margin-bottom:14px}
-.modal .mbtn{width:100%;height:48px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;transition:opacity .15s}
+.modal .mbtn{width:100%;height:48px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:2px;transition:opacity .15s}
 .modal .mbtn:disabled{opacity:.6}
-.modal .mswitch{font-size:13px;color:var(--soft);text-align:center;margin-top:14px;font-weight:500}
+.modal .mswitch{font-size:13px;color:var(--soft);text-align:center;margin-top:10px;font-weight:500}
 .modal .mswitch a{color:var(--brand);font-weight:700;cursor:pointer}
 .modal .merr{color:#C9453F;font-size:12.5px;font-weight:600;margin-top:10px;min-height:16px;text-align:center}
 .modal .mclose{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line);color:var(--faint);font-size:16px;display:grid;place-items:center}
 .modal .mclose:hover{color:var(--ink)}
+.gem-hint{display:block;font-size:0.8rem;font-style:italic;color:var(--faint);margin-top:8px;font-weight:500}
 /* user menu button */
 .ubtn{width:38px;height:38px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--soft);display:grid;place-items:center;font-size:18px;flex:none}
 .ubtn:hover{color:var(--brand);border-color:var(--brand)}
@@ -316,7 +317,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
     <form id="authForm">
       <div class="field"><label>Email</label><input type="email" id="authEmail" required placeholder="your@email.com"></div>
       <div class="field"><label>Password</label><input type="password" id="authPass" required placeholder="Min 6 characters" minlength="6"></div>
-      <div class="field" id="authGemField" style="display:none"><label>Group Gematria (3 digits)</label><input type="text" id="authGem" maxlength="3" inputmode="numeric" placeholder="Enter the gematria to verify"></div>
+      <div class="field" id="authGemField" style="display:none"><label>Group Gematria (3 digits)</label><input type="text" id="authGem" maxlength="3" inputmode="numeric" placeholder="Enter the gematria to verify"><span class="gem-hint">What is Klal Yisrael waiting for?</span></div>
       <button type="submit" class="mbtn" id="authBtn">Create Account</button>
       <div class="merr" id="authErr"></div>
     </form>
