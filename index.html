@@ -25,7 +25,7 @@ button,a{font-family:inherit;color:inherit;text-decoration:none;cursor:pointer;b
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:calc(14px + env(safe-area-inset-top)) 0 12px}
 .top{display:flex;align-items:center;gap:11px}
-.logo{width:80px;height:80px;flex:none;display:grid;place-items:center}
+.logo{width:80px;height:80px;flex:none;display:grid;place-items:center;cursor:pointer}
 .top h1{font-size:18.5px;font-weight:800;letter-spacing:-.02em}
 .top .tag{font-size:11.5px;color:var(--soft);margin-top:1px;font-weight:500}
 .tgl{margin-left:auto;width:38px;height:38px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--soft);display:grid;place-items:center;font-size:18px;flex:none}
@@ -369,6 +369,7 @@ function levenshtein(a,b){
 }
 document.getElementById('q').addEventListener('input',e=>{const raw=e.target.value.trim();const t=raw.toLowerCase();if(!t){show('home');return}if(!SEARCH_INDEX.length)buildSearchIndex();const tokens=t.split(/\s+/).filter(Boolean);const scored=[];for(let i=0;i<SEARCH_INDEX.length;i++){const entry=SEARCH_INDEX[i];const s=fuzzyMatch(tokens,entry.text);if(s>0)scored.push({person:entry.person,score:s});}scored.sort((a,b)=>b.score-a.score||(b.person.score||0)-(a.person.score||0));const hits=scored.map(s=>s.person);const ih=document.getElementById('dIco');ih.style.setProperty('--c','#D2552C');ih.innerHTML='<i class=”ti ti-search”></i>';document.getElementById('dTitle').textContent='”'+raw+'”';document.getElementById('dSub').textContent=hits.length+' matches';if(hits.length)renderList(hits.slice(0,80),null,false);else document.getElementById('dList').innerHTML='<div class=”empty”>No matches yet.</div>';show('detail')});
 document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
+document.querySelector('header .logo').onclick=()=>{document.getElementById('q').value='';show('home');home()};
 document.getElementById('pback').onclick=()=>show('detail');
 function show(v){document.getElementById('home').style.display=v==='home'?'block':'none';document.getElementById('detail').style.display=v==='detail'?'block':'none';document.getElementById('profile').style.display=v==='profile'?'block':'none';scrollTo(0,0)}
 const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
