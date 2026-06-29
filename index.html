@@ -218,6 +218,8 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .admin-item .ai-status.rejected{background:color-mix(in srgb,#C9453F 16%,transparent);color:#C9453F}
 .del-rec{width:34px;height:34px;border-radius:10px;border:1.5px solid #C9453F;background:transparent;color:#C9453F;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:15px;transition:background .15s}
 .del-rec:hover{background:color-mix(in srgb,#C9453F 12%,transparent)}
+.sms-verify{height:34px;padding:0 12px;border-radius:10px;border:1.5px solid #2A8C86;background:transparent;color:#2A8C86;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;text-decoration:none;transition:background .15s}
+.sms-verify:hover{background:color-mix(in srgb,#2A8C86 12%,transparent)}
 /* trainer modal */
 #trainer-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
 #trainer-overlay.active{opacity:1;pointer-events:auto}
@@ -780,6 +782,20 @@ function updateAdminTabs(){
   document.getElementById('tabCorrections').classList.toggle('active',adminTab==='corrections');
 }
 
+function findPhoneByName(name){
+  if(!DATA)return'';
+  const n=name.toLowerCase();
+  for(const cat of DATA.categories){
+    const p=cat.contacts.find(c=>(c.name||'').toLowerCase()===n);
+    if(p&&p.phone)return p.phone;
+  }
+  if(DATA.unverified){
+    const p=DATA.unverified.find(c=>(c.name||'').toLowerCase()===n);
+    if(p&&p.phone)return p.phone;
+  }
+  return'';
+}
+
 async function loadAdmin(){
   if(!userProfile||userProfile.role!=='admin'){show('home');return;}
   const list=document.getElementById('adminList');
@@ -793,7 +809,10 @@ async function loadAdmin(){
       const email=c.requester_email?`<div class="ai-email">${esc(c.requester_email)}</div>`:'';
       const del=`<button class="del-rec" onclick="deleteRequestRecord('profile_claims','${c.id}')"><i class="ti ti-trash"></i></button>`;
       if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-top"><span class="ai-status ${c.status}">${c.status}</span>${del}</div></div>`;
-      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button>${del}</div></div>`;
+      const phone=findPhoneByName(c.target_contact_name);
+      const smsBody=encodeURIComponent('Strictly Business Admin: Did you request to claim your directory profile using the email '+(c.requester_email||'unknown')+'? Reply YES to confirm.');
+      const sms=phone?`<a class="sms-verify" href="sms:${phone}?&body=${smsBody}"><i class="ti ti-message-forward"></i> Verify via SMS</a>`:'';
+      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button>${sms}${del}</div></div>`;
     }).join('');
   }else{
     const{data,error}=await supabase.from('correction_requests').select('*').order('created_at',{ascending:false});
