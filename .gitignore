@@ -4,3 +4,4 @@ contacts.json
 _chat.txt
 *.vcf
 data/
+.env
