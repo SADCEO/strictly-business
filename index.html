@@ -196,6 +196,9 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .pactions{display:flex;gap:10px;margin:18px 0 6px}
 .pactions .pact{flex:1;height:44px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--ink);transition:border-color .15s,background .15s}
 .pactions .pact:hover{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--card))}
+.pactions .pact-admin{border-color:#C9453F;color:#C9453F}
+.pactions .pact-admin:hover{background:color-mix(in srgb,#C9453F 10%,var(--card));border-color:#C9453F}
+.admin-item .ai-email{font-size:12px;color:var(--faint);font-weight:500;margin-bottom:4px}
 /* admin */
 #admin{padding-bottom:40px}
 .admin-tab{display:flex;gap:8px;margin:14px 0 18px}
@@ -281,6 +284,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   <div class="pactions" id="pActions" style="display:none">
     <button class="pact" id="claimBtn"><i class="ti ti-user-check"></i> Claim Profile</button>
     <button class="pact" id="correctBtn"><i class="ti ti-edit"></i> Suggest Correction</button>
+    <button class="pact pact-admin" id="masterEditBtn" style="display:none"><i class="ti ti-shield-lock"></i> Master Edit</button>
   </div>
   <div id="pThreadWrap"><div class="psec">From the chat</div><div id="pThreads"></div></div>
   <div id="pTradeWrap"><div class="psec">Also found under</div><div id="pTrades"></div></div>
@@ -300,6 +304,10 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   <div class="set-card">
     <div class="set-title">Help</div>
     <div class="set-row"><span>App Tutorial</span><button class="mbtn" id="replayTutorial" style="margin:0;width:auto;height:36px;padding:0 16px;font-size:12.5px"><i class="ti ti-player-play"></i> Replay</button></div>
+  </div>
+  <div class="set-card" id="adminCard" style="display:none">
+    <div class="set-title">Administration</div>
+    <div class="set-row"><span>Manage claims & overrides</span><button class="mbtn" id="goAdminBtn" style="margin:0;width:auto;height:36px;padding:0 16px;font-size:12.5px;background:#C9453F"><i class="ti ti-shield-lock"></i> Admin Dashboard</button></div>
   </div>
 </section>
 <section id="admin">
@@ -350,6 +358,19 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
     <div class="merr" id="correctErr"></div>
   </div>
 </div>
+<div class="modal-overlay" id="masterEditModal">
+  <div class="modal">
+    <button class="mclose" id="masterEditClose"><i class="ti ti-x"></i></button>
+    <h3><i class="ti ti-shield-lock" style="color:#C9453F;margin-right:6px"></i>Master Edit</h3>
+    <p class="msub">Admin override — changes apply immediately</p>
+    <div class="field"><label>Name</label><input type="text" id="meditName" placeholder="Contact name"></div>
+    <div class="field"><label>Trade / Category</label><input type="text" id="meditCategory" placeholder="e.g. Plumbing"></div>
+    <div class="field"><label>Bio</label><textarea id="meditBio" placeholder="Short description..." rows="3"></textarea></div>
+    <div class="field"><label>Tags (comma-separated)</label><input type="text" id="meditTags" placeholder="e.g. reliable, fast, kosher"></div>
+    <button class="mbtn" id="masterEditSubmit" style="background:#C9453F"><i class="ti ti-device-floppy"></i> Save Override</button>
+    <div class="merr" id="masterEditErr"></div>
+  </div>
+</div>
 <script>
 const ICONS={"Real Estate":"ti-home","Legal":"ti-gavel","Construction / Contractor":"ti-backhoe","Landscaping / Lawn / Snow":"ti-plant-2","Plumbing":"ti-droplet","HVAC / Heating & AC":"ti-air-conditioning","Insurance":"ti-shield-half","Appliance Repair":"ti-wash-machine","Electrical":"ti-bolt","Accounting / Tax":"ti-calculator","IT / Computer / Web":"ti-device-laptop","Cleaning":"ti-spray","Printing / Signs / Promo":"ti-printer","Photography / Video":"ti-camera","Flooring":"ti-layout-grid","Catering / Food / Chef":"ti-tools-kitchen-2","Handyman":"ti-tool","Roofing / Gutters":"ti-home-2","Religious Services":"ti-star","Moving / Storage":"ti-truck-delivery","Medical / Dental / Therapy":"ti-stethoscope","Pest Control":"ti-bug","Auto Repair / Mechanic":"ti-car","Painting":"ti-paint","Graphic / Logo Design":"ti-palette","Mortgage":"ti-building-bank","Marketing / Social":"ti-speakerphone","Tires":"ti-disc","Towing / Roadside":"ti-truck","Locksmith":"ti-key","Auto Body / Glass":"ti-car-crash"};
 const FG=["#D2552C","#3E8E4F","#3B6FC4","#A4499A","#C98A1E","#2A8C86","#C9453F","#6A52C7","#7C8A2E"];
@@ -387,6 +408,7 @@ async function tryUnlock(pass,silent){
     document.getElementById('lock').style.display='none';
     home();
     buildSearchIndex();
+    loadOverrides();
     if(!localStorage.getItem('has_seen_trainer')&&window._openTrainer) setTimeout(window._openTrainer,600);
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }catch(e){
@@ -430,14 +452,16 @@ function row(p,rk,cat,uv){
 }
 function openProfile(p){
   window._currentViewedContact=p;
-  const c=col(p.category);
-  const av=document.getElementById('pAv');av.style.setProperty('--c',c);av.textContent=initials(p.name);
-  document.getElementById('pName').textContent=p.name;
-  const pc=document.getElementById('pCat');pc.style.setProperty('--c',c);pc.innerHTML=`${ico(p.category)}<span>${esc(p.category)}</span>`;
+  const displayName=p._override_name||p.name;
+  const displayCategory=p._override_category||p.category;
+  const c=col(displayCategory);
+  const av=document.getElementById('pAv');av.style.setProperty('--c',c);av.textContent=initials(displayName);
+  document.getElementById('pName').textContent=displayName;
+  const pc=document.getElementById('pCat');pc.style.setProperty('--c',c);pc.innerHTML=`${ico(displayCategory)}<span>${esc(displayCategory)}</span>`;
   const yrs=p.first&&p.last?(p.first.slice(0,4)===p.last.slice(0,4)?p.first.slice(0,4):p.first.slice(0,4)+'–'+p.last.slice(0,4)):'—';
   document.getElementById('pStats').innerHTML=`<div class="ps"><b>${p.vouchers}</b><span>VOUCHES</span></div><div class="ps"><b>${p.mentions}</b><span>MENTIONS</span></div><div class="ps"><b>${yrs}</b><span>ACTIVE</span></div>`;
   const call=document.getElementById('pCall');if(p.phone){call.style.display='flex';call.href='tel:'+p.phone;call.querySelector('span').textContent='Call '+p.phone_fmt}else call.style.display='none';
-  const recs=(p.asks||[]);
+  const recs=p._override_tags?p._override_tags.split(',').map(s=>s.trim()).filter(Boolean):(p.asks||[]);
   document.getElementById('pRecWrap').style.display=recs.length?'block':'none';
   document.getElementById('pRec').innerHTML=recs.map(a=>`<span class="ask">${esc(a)}</span>`).join('');
   // conversation threads — who asked, what they asked, who answered
@@ -455,6 +479,7 @@ function openProfile(p){
   document.getElementById('pTradeWrap').style.display=others.length?'block':'none';
   document.getElementById('pTrades').innerHTML=others.map(t=>{const tc=col(t.category);return `<div class="trade"><div class="th"><div class="ti0 ic" style="--c:${tc}">${ico(t.category)}</div><div class="tn">${esc(t.category)}</div><div class="tv">${t.vouchers} vouch${t.vouchers>1?'es':''}</div></div>${t.evidence?`<div class="tq">${esc(t.evidence)}</div>`:''}</div>`}).join('');
   document.getElementById('pActions').style.display='flex';
+  document.getElementById('masterEditBtn').style.display=(userProfile&&userProfile.role==='admin')?'flex':'none';
   show('profile');
 }
 /* --- Smart Search Index & Fuzzy Multi-Token Matching --- */
@@ -483,6 +508,23 @@ function buildSearchIndex(){
     ];
     SEARCH_INDEX.push({person:p,text:parts.join(' ').toLowerCase()});
   });
+}
+async function loadOverrides(){
+  if(!DATA)return;
+  const{data}=await supabase.from('contact_overrides').select('*');
+  if(!data||!data.length)return;
+  const map=Object.create(null);
+  data.forEach(o=>{map[o.contact_name]=o;});
+  const apply=p=>{
+    const o=map[p.name];
+    if(!o)return;
+    if(o.override_name)p._override_name=o.override_name;
+    if(o.override_category)p._override_category=o.override_category;
+    if(o.override_bio)p._override_bio=o.override_bio;
+    if(o.override_tags)p._override_tags=o.override_tags;
+  };
+  DATA.categories.forEach(c=>c.contacts.forEach(apply));
+  if(DATA.unverified)DATA.unverified.forEach(apply);
 }
 function fuzzyMatch(tokens,text){
   let score=0;
@@ -647,9 +689,11 @@ function showSettings(){
       await supabase.from('user_profiles').update({preferred_theme:newTheme}).eq('id',currentUser.id);
     }
   };
+  document.getElementById('adminCard').style.display=(userProfile&&userProfile.role==='admin')?'block':'none';
   show('settings');
 }
 document.getElementById('setBack').onclick=()=>show('home');
+document.getElementById('goAdminBtn').onclick=()=>{show('admin');loadAdmin()};
 document.getElementById('logoutBtn').onclick=async()=>{
   await supabase.auth.signOut();
   currentUser=null;userProfile=null;
@@ -684,6 +728,7 @@ document.getElementById('claimSubmit').onclick=async()=>{
   btn.disabled=true;
   const{error}=await supabase.from('profile_claims').insert({
     user_id:currentUser.id,
+    requester_email:currentUser.email||null,
     target_contact_name:window._currentViewedContact.name,
     target_contact_category:window._currentViewedContact.category||null
   });
@@ -700,6 +745,7 @@ document.getElementById('correctSubmit').onclick=async()=>{
   btn.disabled=true;
   const{error}=await supabase.from('correction_requests').insert({
     user_id:currentUser.id,
+    requester_email:currentUser.email||null,
     contact_name:window._currentViewedContact.name,
     contact_category:window._currentViewedContact.category||null,
     notes
@@ -722,6 +768,7 @@ function updateAdminTabs(){
 }
 
 async function loadAdmin(){
+  if(!userProfile||userProfile.role!=='admin'){show('home');return;}
   const list=document.getElementById('adminList');
   list.innerHTML='<div class="empty">Loading...</div>';
   if(adminTab==='claims'){
@@ -730,8 +777,9 @@ async function loadAdmin(){
     if(!data.length){list.innerHTML='<div class="empty">No claims yet</div>';return;}
     list.innerHTML=data.map(c=>{
       const dt=new Date(c.created_at).toLocaleDateString();
-      if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div><span class="ai-status ${c.status}">${c.status}</span></div>`;
-      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div><div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button></div></div>`;
+      const email=c.requester_email?`<div class="ai-email">${esc(c.requester_email)}</div>`:'';
+      if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<span class="ai-status ${c.status}">${c.status}</span></div>`;
+      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button></div></div>`;
     }).join('');
   }else{
     const{data,error}=await supabase.from('correction_requests').select('*').order('created_at',{ascending:false});
@@ -739,8 +787,9 @@ async function loadAdmin(){
     if(!data.length){list.innerHTML='<div class="empty">No corrections yet</div>';return;}
     list.innerHTML=data.map(c=>{
       const dt=new Date(c.created_at).toLocaleDateString();
-      if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.contact_name)}</span><span class="ai-date">${dt}</span></div><div class="ai-note">${esc(c.notes)}</div><span class="ai-status ${c.status}">${c.status}</span></div>`;
-      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.contact_name)}</span><span class="ai-date">${dt}</span></div><div class="ai-note">${esc(c.notes)}</div><div class="ai-actions"><button class="approve" onclick="adminAction('correction_requests','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('correction_requests','${c.id}','rejected')">Reject</button></div></div>`;
+      const email=c.requester_email?`<div class="ai-email">${esc(c.requester_email)}</div>`:'';
+      if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">${esc(c.notes)}</div><span class="ai-status ${c.status}">${c.status}</span></div>`;
+      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">${esc(c.notes)}</div><div class="ai-actions"><button class="approve" onclick="adminAction('correction_requests','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('correction_requests','${c.id}','rejected')">Reject</button></div></div>`;
     }).join('');
   }
 }
@@ -748,6 +797,49 @@ async function loadAdmin(){
 window.adminAction=async function(table,id,status){
   await supabase.from(table).update({status,reviewed_at:new Date().toISOString()}).eq('id',id);
   loadAdmin();
+};
+
+// --- Master Edit Modal ---
+const masterEditModal=document.getElementById('masterEditModal');
+document.getElementById('masterEditClose').onclick=()=>masterEditModal.classList.remove('active');
+masterEditModal.onclick=e=>{if(e.target===masterEditModal)masterEditModal.classList.remove('active')};
+
+document.getElementById('masterEditBtn').onclick=()=>{
+  if(!userProfile||userProfile.role!=='admin')return;
+  const p=window._currentViewedContact;
+  if(!p)return;
+  document.getElementById('meditName').value=p.name||'';
+  document.getElementById('meditCategory').value=p.category||'';
+  document.getElementById('meditBio').value=p.bio||'';
+  document.getElementById('meditTags').value=(p.asks||[]).join(', ');
+  document.getElementById('masterEditErr').textContent='';
+  masterEditModal.classList.add('active');
+};
+
+document.getElementById('masterEditSubmit').onclick=async()=>{
+  const p=window._currentViewedContact;
+  if(!p)return;
+  const btn=document.getElementById('masterEditSubmit');
+  const err=document.getElementById('masterEditErr');
+  btn.disabled=true;err.textContent='';
+  const payload={
+    contact_name:p.name,
+    override_name:document.getElementById('meditName').value.trim()||null,
+    override_category:document.getElementById('meditCategory').value.trim()||null,
+    override_bio:document.getElementById('meditBio').value.trim()||null,
+    override_tags:document.getElementById('meditTags').value.trim()||null,
+    updated_by:currentUser.id,
+    updated_at:new Date().toISOString()
+  };
+  const{error}=await supabase.from('contact_overrides').upsert(payload,{onConflict:'contact_name'});
+  btn.disabled=false;
+  if(error){err.textContent='Error: '+error.message;return;}
+  masterEditModal.classList.remove('active');
+  if(payload.override_name)p._override_name=payload.override_name;
+  if(payload.override_category)p._override_category=payload.override_category;
+  if(payload.override_bio)p._override_bio=payload.override_bio;
+  if(payload.override_tags)p._override_tags=payload.override_tags;
+  openProfile(p);
 };
 
 // Admin route check
