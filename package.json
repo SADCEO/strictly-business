@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npx serve .",
-    "build": "echo 'Static site - no build step required'",
-    "preview": "npx serve ."
+    "build": "node -e \"const fs=require('fs');fs.rmSync('dist',{recursive:true,force:true});fs.mkdirSync('dist');['index.html','app_data.enc','sw.js','manifest.webmanifest','favicon.png','apple-touch-icon.png','icon-192.png','icon-512.png'].forEach(f=>{try{fs.copyFileSync(f,'dist/'+f)}catch(e){}})\"",
+    "preview": "npx serve dist"
   }
 }
