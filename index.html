@@ -209,6 +209,19 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .admin-item .ai-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;display:inline-block}
 .admin-item .ai-status.approved{background:color-mix(in srgb,#3E8E4F 16%,transparent);color:#3E8E4F}
 .admin-item .ai-status.rejected{background:color-mix(in srgb,#C9453F 16%,transparent);color:#C9453F}
+/* trainer modal */
+#trainer-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
+#trainer-overlay.active{opacity:1;pointer-events:auto}
+#trainer-modal{background:var(--card);border:2px solid var(--line);border-radius:28px;padding:36px 28px 28px;width:100%;max-width:380px;position:relative;box-shadow:0 24px 60px rgba(40,33,27,.25);transform:translateY(20px) scale(.96);transition:transform .35s cubic-bezier(.22,.68,0,1.1);text-align:center}
+#trainer-overlay.active #trainer-modal{transform:translateY(0) scale(1)}
+#trainer-modal .tr-icon{width:56px;height:56px;border-radius:16px;background:color-mix(in srgb,var(--brand) 14%,transparent);color:var(--brand);display:grid;place-items:center;font-size:26px;margin:0 auto 18px}
+#trainer-modal .tr-text{font-size:15px;font-weight:500;line-height:1.55;color:var(--ink);min-height:60px;margin-bottom:22px}
+#trainer-modal .tr-dots{display:flex;gap:8px;justify-content:center;margin-bottom:22px}
+#trainer-modal .tr-dot{width:8px;height:8px;border-radius:50%;background:var(--line);transition:background .2s,transform .2s}
+#trainer-modal .tr-dot.active{background:var(--brand);transform:scale(1.3)}
+#trainer-modal .tr-next{width:100%;height:48px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
+#trainer-modal .tr-skip{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line);color:var(--faint);font-size:16px;display:grid;place-items:center}
+#trainer-modal .tr-skip:hover{color:var(--ink)}
 </style></head>
 <body>
 <div id="lock">
@@ -279,6 +292,10 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
     <div class="set-title">Account</div>
     <div class="set-row"><span id="setEmail">Not signed in</span></div>
     <div class="set-row"><button class="mbtn" id="logoutBtn" style="margin:0;height:40px;font-size:13px"><i class="ti ti-logout"></i> Sign Out</button></div>
+  </div>
+  <div class="set-card">
+    <div class="set-title">Help</div>
+    <div class="set-row"><span>App Tutorial</span><button class="mbtn" id="replayTutorial" style="margin:0;width:auto;height:36px;padding:0 16px;font-size:12.5px"><i class="ti ti-player-play"></i> Replay</button></div>
   </div>
 </section>
 <section id="admin">
@@ -366,6 +383,7 @@ async function tryUnlock(pass,silent){
     document.getElementById('lock').style.display='none';
     home();
     buildSearchIndex();
+    if(!localStorage.getItem('has_seen_trainer')&&window._openTrainer) setTimeout(window._openTrainer,600);
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }catch(e){
     if(!silent){err.textContent='Not quite. Try again.';btn.disabled=false;btn.innerHTML='<i class="ti ti-lock-open"></i> Enter';clearBoxes();}
@@ -781,6 +799,63 @@ initAuth().then(()=>{checkAdminRoute()});
   document.getElementById('pwa-close').onclick=()=>{
     banner.classList.remove('show');
     localStorage.setItem('pwa-dismissed','1');
+  };
+})();
+</script>
+<!-- Trainer Tutorial Modal -->
+<div id="trainer-overlay">
+  <div id="trainer-modal">
+    <button class="tr-skip" id="trSkip" aria-label="Skip tutorial"><i class="ti ti-x"></i></button>
+    <div class="tr-icon"><i class="ti ti-compass"></i></div>
+    <div class="tr-text" id="trText"></div>
+    <div class="tr-dots" id="trDots"></div>
+    <button class="tr-next" id="trNext">Next</button>
+  </div>
+</div>
+<script>
+(function(){
+  const STEPS=[
+    "Welcome to Strictly Business. Let\u2019s walk through how to use the directory.",
+    "Smart Search: Type a name, a trade, or even a keyword like \u2018basement flood\u2019 to find the exact right person based on chat history.",
+    "Profile & Evidence: Click any card to see a contact\u2019s full profile, who recommended them, and the exact chat thread where they were vouched for.",
+    "Community Driven: Use the Settings or Profile buttons to claim your own business or suggest corrections to keep the directory accurate."
+  ];
+  const ICONS=["ti-compass","ti-search","ti-user-search","ti-users-group"];
+  let step=0;
+  const overlay=document.getElementById('trainer-overlay');
+  const textEl=document.getElementById('trText');
+  const dotsEl=document.getElementById('trDots');
+  const nextBtn=document.getElementById('trNext');
+  const iconEl=overlay.querySelector('.tr-icon i');
+
+  function renderStep(){
+    textEl.textContent=STEPS[step];
+    iconEl.className='ti '+ICONS[step];
+    dotsEl.innerHTML=STEPS.map((_,i)=>'<div class="tr-dot'+(i===step?' active':'')+'"></div>').join('');
+    nextBtn.textContent=step===STEPS.length-1?'Done':'Next';
+  }
+
+  function openTrainer(){
+    step=0;renderStep();
+    overlay.classList.add('active');
+  }
+
+  function closeTrainer(){
+    overlay.classList.remove('active');
+    localStorage.setItem('has_seen_trainer','true');
+  }
+
+  nextBtn.onclick=()=>{
+    if(step<STEPS.length-1){step++;renderStep();}
+    else closeTrainer();
+  };
+  document.getElementById('trSkip').onclick=closeTrainer;
+
+  window._openTrainer=openTrainer;
+
+  document.getElementById('replayTutorial').onclick=()=>{
+    show('home');
+    setTimeout(openTrainer,200);
   };
 })();
 </script>
