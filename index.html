@@ -481,7 +481,7 @@ function openProfile(p){
   document.getElementById('pTradeWrap').style.display=others.length?'block':'none';
   document.getElementById('pTrades').innerHTML=others.map(t=>{const tc=col(t.category);return `<div class="trade"><div class="th"><div class="ti0 ic" style="--c:${tc}">${ico(t.category)}</div><div class="tn">${esc(t.category)}</div><div class="tv">${t.vouchers} vouch${t.vouchers>1?'es':''}</div></div>${t.evidence?`<div class="tq">${esc(t.evidence)}</div>`:''}</div>`}).join('');
   document.getElementById('pActions').style.display='flex';
-  document.getElementById('masterEditBtn').style.display=(userProfile&&userProfile.role==='admin')?'flex':'none';
+  document.getElementById('masterEditBtn').style.display=(window.userProfile&&window.userProfile.role==='admin')?'flex':'none';
   show('profile');
 }
 /* --- Smart Search Index & Fuzzy Multi-Token Matching --- */
@@ -577,7 +577,7 @@ async function initAuth(){
   if(session) await setUser(session.user);
   supabase.auth.onAuthStateChange(async(event,session)=>{
     if(event==='SIGNED_IN'&&session) await setUser(session.user);
-    else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;updateUserBtn();}
+    else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;window.userProfile=null;updateUserBtn();}
   });
 }
 
@@ -585,6 +585,7 @@ async function setUser(user){
   currentUser=user;
   const{data}=await supabase.from('user_profiles').select('*').eq('id',user.id).maybeSingle();
   userProfile=data;
+  window.userProfile=userProfile;
   if(userProfile&&userProfile.preferred_theme){
     applyTheme(userProfile.preferred_theme);
     localStorage.setItem('sb-theme',userProfile.preferred_theme);
@@ -698,7 +699,7 @@ document.getElementById('setBack').onclick=()=>show('home');
 document.getElementById('goAdminBtn').onclick=()=>{show('admin');loadAdmin()};
 document.getElementById('logoutBtn').onclick=async()=>{
   await supabase.auth.signOut();
-  currentUser=null;userProfile=null;
+  currentUser=null;userProfile=null;window.userProfile=null;
   updateUserBtn();
   show('home');
 };
