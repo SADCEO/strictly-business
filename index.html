@@ -73,6 +73,9 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .bd{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
 .bd.c{background:color-mix(in srgb,#3E8E4F 16%,transparent);color:#3E8E4F}
 .bd.l{background:color-mix(in srgb,#C98A1E 16%,transparent);color:#C98A1E}
+.bd.u{background:color-mix(in srgb,#C98A1E 10%,transparent);color:#C98A1E;border:1.5px dashed #C98A1E}
+.snip{font-size:12px;color:var(--soft);font-style:italic;margin-top:8px;line-height:1.45;padding-left:2px}
+.snip mark{background:color-mix(in srgb,var(--brand) 18%,transparent);color:var(--brand);font-style:normal;border-radius:3px;padding:0 2px;font-weight:600}
 .rm{font-size:12.5px;color:var(--soft);margin-top:5px;font-weight:600}.rm b{color:var(--ink)}
 .asks{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}
 .ask{font-size:11.5px;font-weight:600;color:var(--soft);background:var(--bg);border:1.5px solid var(--line);padding:4px 10px;border-radius:30px}
@@ -202,10 +205,10 @@ const FG=["#D2552C","#3E8E4F","#3B6FC4","#A4499A","#C98A1E","#2A8C86","#C9453F",
 const col=c=>FG[[...(c||'')].reduce((a,ch)=>a+ch.charCodeAt(0),0)%FG.length];
 const ico=c=>`<i class="ti ${ICONS[c]||'ti-point'}"></i>`;
 const initials=n=>(n||'?').replace(/[^a-zA-Z ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
-let DATA=null,LIST=[];
+let DATA=null,LIST=[],SEARCH_INDEX=[];
 
 /* theme */
-function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('tgl').innerHTML=`<i class="ti ti-${t==='dark'?'sun':'moon'}"></i>`;const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#171310':'#FBF4EC')}
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('tgl').innerHTML=`<i class=”ti ti-${t==='dark'?'sun':'moon'}”></i>`;const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#171310':'#FBF4EC')}
 applyTheme(localStorage.getItem('sb-theme')||'light');
 document.getElementById('tgl').onclick=()=>{const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';localStorage.setItem('sb-theme',n);applyTheme(n)};
 
@@ -226,15 +229,16 @@ async function decrypt(pass){
 }
 async function tryUnlock(pass,silent){
   const btn=document.getElementById('lbtn'),err=document.getElementById('lerr');
-  if(!silent){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2"></i> Unlocking…';}
+  if(!silent){btn.disabled=true;btn.innerHTML='<i class=”ti ti-loader-2”></i> Unlocking…';}
   try{
     DATA=await decrypt(pass);
     sessionStorage.setItem('sb-pass',pass);
     document.getElementById('lock').style.display='none';
+    buildIndex();
     home();
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }catch(e){
-    if(!silent){err.textContent='Not quite. Try again.';btn.disabled=false;btn.innerHTML='<i class="ti ti-lock-open"></i> Enter';clearBoxes();}
+    if(!silent){err.textContent='Not quite. Try again.';btn.disabled=false;btn.innerHTML='<i class=”ti ti-lock-open”></i> Enter';clearBoxes();}
     else sessionStorage.removeItem('sb-pass');
   }
 }
@@ -248,29 +252,108 @@ boxes.forEach((b,i)=>{
 document.getElementById('lform').addEventListener('submit',ev=>{ev.preventDefault();const v=gematria();if(v.length===3)tryUnlock(v,false);});
 boxes[0].focus();
 
+/* ---- search index ---- */
+function buildIndex(){
+  SEARCH_INDEX=[];
+  DATA.categories.forEach(c=>{
+    c.contacts.forEach(p=>{
+      const parts=[
+        p.name||'',
+        c.name||'',
+        ...(p.asks||[]),
+        ...(p.threads||[]).flatMap(t=>[t.question||'',t.said||'',t.by||'',t.asker||'']),
+        ...(p.trades||[]).flatMap(t=>[t.category||'',t.evidence||'']),
+      ];
+      SEARCH_INDEX.push({p,unverified:false,blob:parts.join(' ').toLowerCase(),fields:{name:(p.name||'').toLowerCase(),cat:c.name.toLowerCase(),asks:(p.asks||[]).map(a=>a.toLowerCase()),threads:(p.threads||[]).map(t=>((t.question||'')+' '+(t.said||'')).toLowerCase()),evidence:(p.trades||[]).map(t=>(t.evidence||'').toLowerCase())}});
+    });
+  });
+  (DATA.unverified||[]).forEach(p=>{
+    const parts=[
+      p.name||'',
+      p.category||'',
+      ...(p.asks||[]),
+      ...(p.threads||[]).flatMap(t=>[t.question||'',t.said||'',t.by||'',t.asker||'']),
+      ...(p.trades||[]).flatMap(t=>[t.category||'',t.evidence||'']),
+    ];
+    SEARCH_INDEX.push({p,unverified:true,blob:parts.join(' ').toLowerCase(),fields:{name:(p.name||'').toLowerCase(),cat:(p.category||'').toLowerCase(),asks:(p.asks||[]).map(a=>a.toLowerCase()),threads:(p.threads||[]).map(t=>((t.question||'')+' '+(t.said||'')).toLowerCase()),evidence:(p.trades||[]).map(t=>(t.evidence||'').toLowerCase())}});
+  });
+}
+
+function editDist(a,b){
+  if(Math.abs(a.length-b.length)>2) return 99;
+  const m=a.length,n=b.length,d=[];
+  for(let i=0;i<=m;i++)d[i]=[i];
+  for(let j=0;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]:1+Math.min(d[i-1][j],d[i][j-1],d[i-1][j-1]);
+  return d[m][n];
+}
+
+function tokenMatch(token,text){
+  if(text.includes(token)) return true;
+  if(token.length>=5){const words=text.split(/\s+/);return words.some(w=>w.length>=3&&editDist(token,w)<=1);}
+  return false;
+}
+
+function scoreEntry(tokens,entry){
+  let score=0,snippet='',snippetSrc='';
+  const {fields,blob}=entry;
+  for(const tk of tokens){
+    if(tokenMatch(tk,fields.name)){score+=50;continue;}
+    if(tokenMatch(tk,fields.cat)){score+=30;continue;}
+    let askHit=false;
+    for(const a of fields.asks){if(tokenMatch(tk,a)){score+=20;askHit=true;break;}}
+    if(askHit) continue;
+    let threadHit=false;
+    for(const th of fields.threads){if(tokenMatch(tk,th)){score+=10;if(!snippet){snippet=th;snippetSrc='chat';}threadHit=true;break;}}
+    if(threadHit) continue;
+    for(const ev of fields.evidence){if(tokenMatch(tk,ev)){score+=8;if(!snippet){snippet=ev;snippetSrc='mention';}break;}}
+  }
+  return{score,snippet,snippetSrc};
+}
+
+function extractSnippet(text,tokens){
+  const words=text.split(/\s+/);
+  let best=-1,bestScore=0;
+  words.forEach((w,i)=>{
+    const s=tokens.filter(tk=>tokenMatch(tk,w.toLowerCase())).length;
+    if(s>bestScore){bestScore=s;best=i;}
+  });
+  if(best<0) return text.slice(0,90);
+  const start=Math.max(0,best-5),end=Math.min(words.length,best+10);
+  let snip=(start>0?'…':'')+words.slice(start,end).join(' ')+(end<words.length?'…':'');
+  tokens.forEach(tk=>{
+    snip=snip.replace(new RegExp('('+tk.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>');
+  });
+  return snip;
+}
+
+/* ---- rendering ---- */
 function home(){
   const s=DATA.stats;
-  document.getElementById('stats').innerHTML=`<div class="stat"><b>${s.listed.toLocaleString()}</b><span>RECOMMENDED</span></div><div class="stat"><b>${s.categories}</b><span>TRADES</span></div><div class="stat"><b>8 yrs</b><span>OF CHAT</span></div>`;
+  document.getElementById('stats').innerHTML=`<div class=”stat”><b>${s.listed.toLocaleString()}</b><span>RECOMMENDED</span></div><div class=”stat”><b>${s.categories}</b><span>TRADES</span></div><div class=”stat”><b>8 yrs</b><span>OF CHAT</span></div>`;
   document.getElementById('trc').textContent=`${DATA.categories.length} trades`;
   document.getElementById('uvCt').textContent=`${s.unverified.toLocaleString()} contacts`;
-  document.getElementById('cats').innerHTML=DATA.categories.map((c,i)=>`<button class="cat" data-i="${i}"><div class="ic" style="--c:${col(c.name)}">${ico(c.name)}</div><div><div class="nm">${c.name}</div><div class="ct">${c.count} ${c.count===1?'person':'people'}</div></div></button>`).join('');
+  document.getElementById('cats').innerHTML=DATA.categories.map((c,i)=>`<button class=”cat” data-i=”${i}”><div class=”ic” style=”--c:${col(c.name)}”>${ico(c.name)}</div><div><div class=”nm”>${c.name}</div><div class=”ct”>${c.count} ${c.count===1?'person':'people'}</div></div></button>`).join('');
   document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>openCat(DATA.categories[b.dataset.i]));
   document.getElementById('uvBtn').onclick=openUnverified;
 }
 function setHead(cat,title,sub){const ih=document.getElementById('dIco');ih.style.setProperty('--c',col(cat));ih.innerHTML=ico(cat);document.getElementById('dTitle').textContent=title;document.getElementById('dSub').textContent=sub}
 function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'people'}`);renderList(c.contacts,c.name,false);show('detail')}
-function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class="ti ti-help-circle"></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);show('detail')}
-function renderList(arr,cat,uv){
+function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class=”ti ti-help-circle”></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);show('detail')}
+function renderList(arr,cat,uv,snippets){
   LIST=arr;
-  document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,cat||p.category,uv)).join('');
+  document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,cat||p.category,uv,snippets&&snippets[i])).join('');
   document.querySelectorAll('#dList .row').forEach(r=>r.onclick=e=>{if(e.target.closest('.call'))return;openProfile(LIST[+r.dataset.idx])});
 }
-function row(p,rk,cat,uv){
+function row(p,rk,cat,uv,snip){
   const medal=rk<=3&&!uv?['🥇','🥈','🥉'][rk-1]:'';
-  const asks=(p.asks||[]).slice(0,3).map(a=>`<span class="ask">${esc(a)}</span>`).join('');
-  const bd=p.confidence==='high'?'<span class="bd c"><i class="ti ti-rosette-discount-check" style="font-size:12px"></i>Confirmed</span>':'<span class="bd l">Likely</span>';
-  const tel=p.phone?`<a class="call" href="tel:${p.phone}"><i class="ti ti-phone"></i>Call</a>`:'';
-  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(p.name)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(p.name)}</span>${bd}</div><div class="rm"><b>${p.vouchers}</b> vouched${p.last?' · '+p.last.slice(0,4):''}</div>${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
+  const asks=(p.asks||[]).slice(0,3).map(a=>`<span class=”ask”>${esc(a)}</span>`).join('');
+  const bd=uv
+    ?'<span class=”bd u”><i class=”ti ti-alert-triangle” style=”font-size:11px”></i>Unverified lead</span>'
+    :p.confidence==='high'?'<span class=”bd c”><i class=”ti ti-rosette-discount-check” style=”font-size:12px”></i>Confirmed</span>':'<span class=”bd l”>Likely</span>';
+  const tel=p.phone?`<a class=”call” href=”tel:${p.phone}”><i class=”ti ti-phone”></i>Call</a>`:'';
+  const snippetHtml=snip?`<div class=”snip”>${snip}</div>`:'';
+  return `<div class=”row” data-idx=”${rk-1}”><div class=”av” style=”--c:${col(cat)}”>${initials(p.name)}</div><div class=”rb”><div class=”rtop”>${medal?`<span class=”medal”>${medal}</span>`:''}<span class=”rn”>${esc(p.name)}</span>${bd}</div><div class=”rm”><b>${p.vouchers}</b> vouched${p.last?' · '+p.last.slice(0,4):''}</div>${asks?`<div class=”asks”>${asks}</div>`:''}${snippetHtml}</div>${tel}<i class=”ti ti-chevron-right chev”></i></div>`;
 }
 function openProfile(p){
   const c=col(p.category);
@@ -278,28 +361,77 @@ function openProfile(p){
   document.getElementById('pName').textContent=p.name;
   const pc=document.getElementById('pCat');pc.style.setProperty('--c',c);pc.innerHTML=`${ico(p.category)}<span>${esc(p.category)}</span>`;
   const yrs=p.first&&p.last?(p.first.slice(0,4)===p.last.slice(0,4)?p.first.slice(0,4):p.first.slice(0,4)+'–'+p.last.slice(0,4)):'—';
-  document.getElementById('pStats').innerHTML=`<div class="ps"><b>${p.vouchers}</b><span>VOUCHES</span></div><div class="ps"><b>${p.mentions}</b><span>MENTIONS</span></div><div class="ps"><b>${yrs}</b><span>ACTIVE</span></div>`;
+  document.getElementById('pStats').innerHTML=`<div class=”ps”><b>${p.vouchers}</b><span>VOUCHES</span></div><div class=”ps”><b>${p.mentions}</b><span>MENTIONS</span></div><div class=”ps”><b>${yrs}</b><span>ACTIVE</span></div>`;
   const call=document.getElementById('pCall');if(p.phone){call.style.display='flex';call.href='tel:'+p.phone;call.querySelector('span').textContent='Call '+p.phone_fmt}else call.style.display='none';
   const recs=(p.asks||[]);
   document.getElementById('pRecWrap').style.display=recs.length?'block':'none';
-  document.getElementById('pRec').innerHTML=recs.map(a=>`<span class="ask">${esc(a)}</span>`).join('');
-  // conversation threads — who asked, what they asked, who answered
+  document.getElementById('pRec').innerHTML=recs.map(a=>`<span class=”ask”>${esc(a)}</span>`).join('');
   const threads=(p.threads||[]);
   document.getElementById('pThreadWrap').style.display=threads.length?'block':'none';
   document.getElementById('pThreads').innerHTML=threads.map(t=>{
     const said=t.said&&!/^Shared their contact/i.test(t.said)?` “${esc(t.said)}”`:' shared the contact';
-    return `<div class="thread" style="--c:${c}">
-      <div class="qh"><span class="who">${esc(t.asker||'A member')} asked</span><span class="dt">${esc(t.date)}</span></div>
-      <div class="qt">${esc(t.question)}</div>
-      <div class="ans"><i class="ti ti-arrow-back-up"></i><span><b>${esc(t.by)}</b>${said}</span></div></div>`;
+    return `<div class=”thread” style=”--c:${c}”>
+      <div class=”qh”><span class=”who”>${esc(t.asker||'A member')} asked</span><span class=”dt”>${esc(t.date)}</span></div>
+      <div class=”qt”>${esc(t.question)}</div>
+      <div class=”ans”><i class=”ti ti-arrow-back-up”></i><span><b>${esc(t.by)}</b>${said}</span></div></div>`;
   }).join('');
-  // other trades this person shows up under (skip the primary, already shown as the badge)
   const others=(p.trades||[]).filter(t=>t.category!==p.category);
   document.getElementById('pTradeWrap').style.display=others.length?'block':'none';
-  document.getElementById('pTrades').innerHTML=others.map(t=>{const tc=col(t.category);return `<div class="trade"><div class="th"><div class="ti0 ic" style="--c:${tc}">${ico(t.category)}</div><div class="tn">${esc(t.category)}</div><div class="tv">${t.vouchers} vouch${t.vouchers>1?'es':''}</div></div>${t.evidence?`<div class="tq">${esc(t.evidence)}</div>`:''}</div>`}).join('');
+  document.getElementById('pTrades').innerHTML=others.map(t=>{const tc=col(t.category);return `<div class=”trade”><div class=”th”><div class=”ti0 ic” style=”--c:${tc}”>${ico(t.category)}</div><div class=”tn”>${esc(t.category)}</div><div class=”tv”>${t.vouchers} vouch${t.vouchers>1?'es':''}</div></div>${t.evidence?`<div class=”tq”>${esc(t.evidence)}</div>`:''}</div>`}).join('');
   show('profile');
 }
-document.getElementById('q').addEventListener('input',e=>{const t=e.target.value.trim().toLowerCase();if(!t){show('home');return}const hits=[];DATA.categories.forEach(c=>c.contacts.forEach(p=>{if(p.name.toLowerCase().includes(t)||c.name.toLowerCase().includes(t))hits.push(p)}));hits.sort((a,b)=>b.score-a.score);const ih=document.getElementById('dIco');ih.style.setProperty('--c','#D2552C');ih.innerHTML='<i class="ti ti-search"></i>';document.getElementById('dTitle').textContent='“'+e.target.value.trim()+'”';document.getElementById('dSub').textContent=hits.length+' matches';if(hits.length)renderList(hits.slice(0,80),null,false);else document.getElementById('dList').innerHTML='<div class="empty">No matches yet.</div>';show('detail')});
+
+/* ---- smart search handler ---- */
+document.getElementById('q').addEventListener('input',e=>{
+  const raw=e.target.value.trim();
+  const t=raw.toLowerCase();
+  if(!t){show('home');return;}
+  const ih=document.getElementById('dIco');
+  ih.style.setProperty('--c','#D2552C');
+  ih.innerHTML='<i class=”ti ti-search”></i>';
+  document.getElementById('dTitle').textContent='”'+raw+'”';
+
+  const tokens=t.split(/\s+/).filter(tk=>tk.length>0);
+  const smartMode=tokens.some(tk=>tk.length>=3);
+
+  if(!smartMode){
+    // simple mode: 1–2 char single token, just match name/category substring
+    const hits=[];
+    DATA.categories.forEach(c=>c.contacts.forEach(p=>{
+      if(p.name.toLowerCase().includes(t)||c.name.toLowerCase().includes(t)) hits.push(p);
+    }));
+    hits.sort((a,b)=>b.score-a.score);
+    document.getElementById('dSub').textContent=hits.length+' matches';
+    if(hits.length) renderList(hits.slice(0,80),null,false);
+    else document.getElementById('dList').innerHTML='<div class=”empty”>No matches yet.</div>';
+    show('detail');
+    return;
+  }
+
+  // smart mode: score all index entries
+  const results=[];
+  SEARCH_INDEX.forEach(entry=>{
+    const{score,snippet,snippetSrc}=scoreEntry(tokens,entry);
+    if(score>0){
+      const snipHtml=snippet&&snippetSrc!=='name'?extractSnippet(snippet,tokens):null;
+      results.push({p:entry.p,uv:entry.unverified,score:score+(entry.p.score||0)*0.1,snip:snipHtml});
+    }
+  });
+  results.sort((a,b)=>b.score-a.score);
+  const top=results.slice(0,80);
+  document.getElementById('dSub').textContent=results.length+' matches · searching all mentions';
+  if(top.length){
+    const arr=top.map(r=>r.p);
+    const snippets=top.map(r=>r.snip);
+    const uvFlags=top.map(r=>r.uv);
+    LIST=arr;
+    document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,p.category,uvFlags[i],snippets[i])).join('');
+    document.querySelectorAll('#dList .row').forEach(r=>r.onclick=ev=>{if(ev.target.closest('.call'))return;openProfile(LIST[+r.dataset.idx]);});
+  } else {
+    document.getElementById('dList').innerHTML='<div class=”empty”>No matches yet.</div>';
+  }
+  show('detail');
+});
 document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
 document.getElementById('pback').onclick=()=>show('detail');
 function show(v){document.getElementById('home').style.display=v==='home'?'block':'none';document.getElementById('detail').style.display=v==='detail'?'block':'none';document.getElementById('profile').style.display=v==='profile'?'block':'none';scrollTo(0,0)}
