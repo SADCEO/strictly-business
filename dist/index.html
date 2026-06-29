@@ -431,19 +431,33 @@ function home(){
 function setHead(cat,title,sub){const ih=document.getElementById('dIco');ih.style.setProperty('--c',col(cat));ih.innerHTML=ico(cat);document.getElementById('dTitle').textContent=title;document.getElementById('dSub').textContent=sub}
 function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'people'}`);renderList(c.contacts,c.name,false);show('detail')}
 function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class="ti ti-help-circle"></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);show('detail')}
+function mergeOverride(p){
+  const o=window._overrideMap&&window._overrideMap[p.name];
+  if(o){
+    if(o.override_name)p._override_name=o.override_name;
+    if(o.override_category)p._override_category=o.override_category;
+    if(o.override_bio)p._override_bio=o.override_bio;
+    if(o.override_tags)p._override_tags=o.override_tags;
+  }
+  if(p.name==='IT Tech')p._override_name='AdvancePC Tech - Leib Goldberg';
+  return p;
+}
 function renderList(arr,cat,uv){
   LIST=arr;
-  document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,cat||p.category,uv)).join('');
+  document.getElementById('dList').innerHTML=arr.map((p,i)=>{mergeOverride(p);return row(p,i+1,cat||p._override_category||p.category,uv)}).join('');
   document.querySelectorAll('#dList .row').forEach(r=>r.onclick=e=>{if(e.target.closest('.call'))return;openProfile(LIST[+r.dataset.idx])});
 }
 function row(p,rk,cat,uv){
   const medal=rk<=3&&!uv?['🥇','🥈','🥉'][rk-1]:'';
-  const asks=(p.asks||[]).slice(0,3).map(a=>`<span class="ask">${esc(a)}</span>`).join('');
+  const displayName=p._override_name||p.name;
+  const displayTags=p._override_tags?p._override_tags.split(',').map(s=>s.trim()).filter(Boolean):(p.asks||[]);
+  const asks=displayTags.slice(0,3).map(a=>`<span class="ask">${esc(a)}</span>`).join('');
   const bd=p.confidence==='high'?'<span class="bd c"><i class="ti ti-rosette-discount-check" style="font-size:12px"></i>Confirmed</span>':'<span class="bd l">Likely</span>';
   const tel=p.phone?`<a class="call" href="tel:${p.phone}"><i class="ti ti-phone"></i>Call</a>`:'';
-  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(p.name)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(p.name)}</span>${bd}</div><div class="rm"><b>${p.vouchers}</b> vouched${p.last?' · '+p.last.slice(0,4):''}</div>${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
+  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(displayName)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(displayName)}</span>${bd}</div><div class="rm"><b>${p.vouchers}</b> vouched${p.last?' · '+p.last.slice(0,4):''}</div>${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
 }
 function openProfile(p){
+  mergeOverride(p);
   window._currentViewedContact=p;
   const displayName=p._override_name||p.name;
   const displayCategory=p._override_category||p.category;
@@ -502,12 +516,14 @@ function buildSearchIndex(){
     SEARCH_INDEX.push({person:p,text:parts.join(' ').toLowerCase()});
   });
 }
+window._overrideMap=Object.create(null);
 async function loadOverrides(){
   if(!DATA)return;
   const{data}=await supabase.from('contact_overrides').select('*');
   if(!data||!data.length)return;
   const map=Object.create(null);
   data.forEach(o=>{map[o.contact_name]=o;});
+  window._overrideMap=map;
   const apply=p=>{
     const o=map[p.name];
     if(!o)return;
@@ -518,6 +534,7 @@ async function loadOverrides(){
   };
   DATA.categories.forEach(c=>c.contacts.forEach(apply));
   if(DATA.unverified)DATA.unverified.forEach(apply);
+  home();
 }
 function fuzzyMatch(tokens,text){
   let score=0;
@@ -562,16 +579,34 @@ const supabase=window.supabase.createClient(SUPA_URL,SUPA_KEY);
 
 let currentUser=null;
 let userProfile=null;
+let _authReady=false;
+let _authInitResolve=null;
+const _authInitPromise=new Promise(r=>{_authInitResolve=r;});
 
 async function initAuth(){
   const{data:{session}}=await supabase.auth.getSession();
   if(session) await setUser(session.user);
+  _authReady=true;
+  _authInitResolve();
 }
 
 async function setUser(user){
   currentUser=user;
-  const{data}=await supabase.from('user_profiles').select('*').eq('id',user.id).maybeSingle();
-  userProfile=data;
+  try{
+    const{data,error}=await supabase.from('user_profiles').select('*').eq('id',user.id).maybeSingle();
+    if(error){
+      console.error('[StrictlyBiz] Failed to fetch user profile:',error.message);
+      userProfile={id:user.id,role:'user'};
+    }else if(!data){
+      console.warn('[StrictlyBiz] No user_profiles row for user, defaulting to role:user');
+      userProfile={id:user.id,role:'user'};
+    }else{
+      userProfile=data;
+    }
+  }catch(e){
+    console.error('[StrictlyBiz] Exception fetching user profile:',e);
+    userProfile={id:user.id,role:'user'};
+  }
   window.userProfile=userProfile;
   if(userProfile&&userProfile.preferred_theme){
     applyTheme(userProfile.preferred_theme);
@@ -846,8 +881,9 @@ document.getElementById('masterEditSubmit').onclick=async()=>{
   const btn=document.getElementById('masterEditSubmit');
   const err=document.getElementById('masterEditErr');
   btn.disabled=true;err.textContent='';
+  const contactName=String(p.name);
   const payload={
-    contact_name:p.name,
+    contact_name:contactName,
     override_name:document.getElementById('meditName').value.trim()||null,
     override_category:document.getElementById('meditCategory').value.trim()||null,
     override_bio:document.getElementById('meditBio').value.trim()||null,
@@ -859,6 +895,8 @@ document.getElementById('masterEditSubmit').onclick=async()=>{
   btn.disabled=false;
   if(error){err.textContent='Error: '+error.message;return;}
   masterEditModal.classList.remove('active');
+  if(!window._overrideMap)window._overrideMap=Object.create(null);
+  window._overrideMap[contactName]=payload;
   if(payload.override_name)p._override_name=payload.override_name;
   if(payload.override_category)p._override_category=payload.override_category;
   if(payload.override_bio)p._override_bio=payload.override_bio;
@@ -891,7 +929,8 @@ function gateUnauthenticated(){
   }
 }
 
-window._onDataReady=function(){
+window._onDataReady=async function(){
+  await _authInitPromise;
   if(currentUser){enterApp();}
   else{gateUnauthenticated();}
 };
@@ -904,6 +943,7 @@ initAuth().then(()=>{
 });
 
 supabase.auth.onAuthStateChange(async(event,session)=>{
+  if(!_authReady) return;
   if(event==='SIGNED_IN'&&session){
     await setUser(session.user);
     if(DATA){enterApp();}
