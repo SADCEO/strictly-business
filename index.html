@@ -234,8 +234,8 @@ async function tryUnlock(pass,silent){
     DATA=await decrypt(pass);
     sessionStorage.setItem('sb-pass',pass);
     document.getElementById('lock').style.display='none';
-    buildIndex();
     home();
+    try{buildIndex();}catch(ie){console.warn('search index build failed',ie);}
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }catch(e){
     if(!silent){err.textContent='Not quite. Try again.';btn.disabled=false;btn.innerHTML='<i class=”ti ti-lock-open”></i> Enter';clearBoxes();}
@@ -383,6 +383,7 @@ function openProfile(p){
 
 /* ---- smart search handler ---- */
 document.getElementById('q').addEventListener('input',e=>{
+  if(!DATA) return;
   const raw=e.target.value.trim();
   const t=raw.toLowerCase();
   if(!t){show('home');return;}
