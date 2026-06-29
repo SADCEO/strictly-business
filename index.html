@@ -52,9 +52,13 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .stat span{font-size:11px;color:var(--faint);font-weight:700;margin-top:3px;display:block;letter-spacing:.03em}
 .sl{font-size:16px;font-weight:800;letter-spacing:-.01em;margin:30px 4px 14px;display:flex;align-items:center;justify-content:space-between}
 .sl .mut{font-size:12.5px;color:var(--faint);font-weight:600}
-.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.cat{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;text-align:left;transition:transform .16s,box-shadow .16s;display:flex;flex-direction:column;gap:12px;min-height:122px}
-.cat:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;perspective:1200px;scroll-snap-type:y proximity}
+.cat{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:12px;min-height:122px;transform-style:preserve-3d;will-change:transform;transition:transform .28s cubic-bezier(.22,.68,0,1.1),box-shadow .28s ease,border-color .28s ease;box-shadow:0 2px 8px rgba(40,33,27,.06),0 6px 20px rgba(40,33,27,.04),inset 0 1px 0 rgba(226,97,60,.08);scroll-snap-align:start}
+.cat:hover{transform:translateY(-6px) scale(1.025) rotateX(1.5deg) rotateY(-1deg);box-shadow:0 8px 24px rgba(40,33,27,.1),0 16px 40px rgba(40,33,27,.08),inset 0 1px 0 rgba(226,97,60,.14);border-color:color-mix(in srgb,var(--brand) 30%,var(--line))}
+.cat:active{transform:translateY(-1px) scale(0.98);box-shadow:0 1px 4px rgba(40,33,27,.08);transition-duration:.1s}
+@supports (animation-timeline:view()){.cat{animation:cardDepth linear both;animation-timeline:view();animation-range:entry 0% cover 50%}@keyframes cardDepth{0%{opacity:.7;transform:scale(.94) translateZ(-20px)}100%{opacity:1;transform:scale(1) translateZ(0)}}}
+:root[data-theme="dark"] .cat{box-shadow:0 2px 8px rgba(0,0,0,.2),0 6px 20px rgba(0,0,0,.15),inset 0 1px 0 rgba(226,97,60,.06)}
+:root[data-theme="dark"] .cat:hover{box-shadow:0 8px 24px rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.2),inset 0 1px 0 rgba(226,97,60,.1)}
 .ic{border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
 :root[data-theme="dark"] .ic{background:color-mix(in srgb,var(--c) 24%,transparent);color:color-mix(in srgb,var(--c) 72%,#fff)}
 .cat .ic{width:50px;height:50px;font-size:25px}
