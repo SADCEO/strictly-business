@@ -106,6 +106,21 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .thread .ans{display:flex;align-items:center;gap:7px;margin-top:11px;font-size:12.5px;color:var(--soft);font-weight:600}
 .thread .ans i{color:var(--c);font-size:15px}
 .thread .ans b{color:var(--ink);font-weight:700}
+/* pwa banner */
+#pwa-banner{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(120px);z-index:90;width:calc(100% - 36px);max-width:420px;background:var(--card);border:2px solid var(--line);border-radius:24px;padding:18px 18px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;transition:transform .38s cubic-bezier(.34,1.42,.64,1),opacity .3s;opacity:0;pointer-events:none}
+#pwa-banner.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+.pwa-top{display:flex;align-items:center;gap:13px}
+.pwa-icon{width:48px;height:48px;border-radius:14px;overflow:hidden;flex:none;background:var(--bg);border:1.5px solid var(--line);display:grid;place-items:center}
+.pwa-icon img{width:100%;height:100%;object-fit:contain}
+.pwa-copy{flex:1;min-width:0}
+.pwa-copy strong{font-size:15px;font-weight:800;letter-spacing:-.01em;display:block}
+.pwa-copy span{font-size:12.5px;color:var(--soft);font-weight:500;margin-top:2px;display:block}
+.pwa-close{width:30px;height:30px;border-radius:50%;background:var(--bg);color:var(--faint);font-size:16px;display:grid;place-items:center;flex:none;align-self:flex-start;border:1.5px solid var(--line)}
+.pwa-close:hover{color:var(--ink)}
+.pwa-actions{display:flex;gap:9px}
+#pwa-btn{flex:1;height:44px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:7px}
+.pwa-ios-steps{font-size:12.5px;color:var(--soft);font-weight:500;line-height:1.55;background:var(--bg);border-radius:14px;padding:12px 14px;border:1.5px solid var(--line)}
+.pwa-ios-steps b{color:var(--ink);font-weight:700}
 @media(min-width:600px){.cats{grid-template-columns:repeat(3,1fr)}.hero h2{font-size:38px}}
 @media(min-width:900px){.cats{grid-template-columns:repeat(4,1fr)}.list{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}}
 @media(min-width:1140px){.cats{grid-template-columns:repeat(5,1fr)}}
@@ -282,4 +297,55 @@ document.getElementById('back').onclick=()=>{document.getElementById('q').value=
 document.getElementById('pback').onclick=()=>show('detail');
 function show(v){document.getElementById('home').style.display=v==='home'?'block':'none';document.getElementById('detail').style.display=v==='detail'?'block':'none';document.getElementById('profile').style.display=v==='profile'?'block':'none';scrollTo(0,0)}
 const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-</script></body></html>
+<div id="pwa-banner" role="dialog" aria-label="Install app">
+  <div class="pwa-top">
+    <div class="pwa-icon"><img src="logo.png" alt=""></div>
+    <div class="pwa-copy">
+      <strong>Add to your home screen</strong>
+      <span>Get quick access — no App Store needed</span>
+    </div>
+    <button class="pwa-close" id="pwa-close" aria-label="Dismiss"><i class="ti ti-x"></i></button>
+  </div>
+  <div id="pwa-native" style="display:none">
+    <div class="pwa-actions">
+      <button id="pwa-btn"><i class="ti ti-download"></i> Add to Home Screen</button>
+    </div>
+  </div>
+  <div id="pwa-ios" style="display:none">
+    <div class="pwa-ios-steps">Tap <b>Share <i class="ti ti-share" style="font-size:13px;vertical-align:middle"></i></b> at the bottom of your browser, then choose <b>"Add to Home Screen"</b> and tap <b>Add</b>.
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  if(localStorage.getItem('pwa-dismissed')) return;
+  let deferredPrompt=null;
+  const banner=document.getElementById('pwa-banner');
+  const isIos=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  if(isInStandalone) return;
+  function showBanner(){
+    if(isIos){document.getElementById('pwa-ios').style.display='block';}
+    else{document.getElementById('pwa-native').style.display='block';}
+    setTimeout(()=>banner.classList.add('show'),600);
+  }
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferredPrompt=e;
+    showBanner();
+  });
+  if(isIos) showBanner();
+  document.getElementById('pwa-btn').onclick=async()=>{
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const{outcome}=await deferredPrompt.userChoice;
+    deferredPrompt=null;
+    banner.classList.remove('show');
+    if(outcome==='accepted') localStorage.setItem('pwa-dismissed','1');
+  };
+  document.getElementById('pwa-close').onclick=()=>{
+    banner.classList.remove('show');
+    localStorage.setItem('pwa-dismissed','1');
+  };
+})();
+</script>
+</body></html>
