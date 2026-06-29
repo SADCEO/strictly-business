@@ -342,7 +342,7 @@ function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'pe
 function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class=”ti ti-help-circle”></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);show('detail')}
 function renderList(arr,cat,uv,snippets){
   LIST=arr;
-  document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,cat||p.category,uv,snippets&&snippets[i])).join('');
+  document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,cat||p.category,Array.isArray(uv)?uv[i]:uv,snippets&&snippets[i])).join('');
   document.querySelectorAll('#dList .row').forEach(r=>r.onclick=e=>{if(e.target.closest('.call'))return;openProfile(LIST[+r.dataset.idx])});
 }
 function row(p,rk,cat,uv,snip){
@@ -382,21 +382,23 @@ function openProfile(p){
 }
 
 /* ---- smart search handler ---- */
+let _searchTimer;
 document.getElementById('q').addEventListener('input',e=>{
   if(!DATA) return;
   const raw=e.target.value.trim();
+  if(!raw){show('home');return;}
+  clearTimeout(_searchTimer);
+  _searchTimer=setTimeout(()=>doSearch(raw),180);
+});
+function doSearch(raw){
   const t=raw.toLowerCase();
-  if(!t){show('home');return;}
   const ih=document.getElementById('dIco');
   ih.style.setProperty('--c','#D2552C');
   ih.innerHTML='<i class=”ti ti-search”></i>';
   document.getElementById('dTitle').textContent='”'+raw+'”';
-
   const tokens=t.split(/\s+/).filter(tk=>tk.length>0);
   const smartMode=tokens.some(tk=>tk.length>=3);
-
   if(!smartMode){
-    // simple mode: 1–2 char single token, just match name/category substring
     const hits=[];
     DATA.categories.forEach(c=>c.contacts.forEach(p=>{
       if(p.name.toLowerCase().includes(t)||c.name.toLowerCase().includes(t)) hits.push(p);
@@ -408,8 +410,6 @@ document.getElementById('q').addEventListener('input',e=>{
     show('detail');
     return;
   }
-
-  // smart mode: score all index entries
   const results=[];
   SEARCH_INDEX.forEach(entry=>{
     const{score,snippet,snippetSrc}=scoreEntry(tokens,entry);
@@ -422,17 +422,12 @@ document.getElementById('q').addEventListener('input',e=>{
   const top=results.slice(0,80);
   document.getElementById('dSub').textContent=results.length+' matches · searching all mentions';
   if(top.length){
-    const arr=top.map(r=>r.p);
-    const snippets=top.map(r=>r.snip);
-    const uvFlags=top.map(r=>r.uv);
-    LIST=arr;
-    document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,p.category,uvFlags[i],snippets[i])).join('');
-    document.querySelectorAll('#dList .row').forEach(r=>r.onclick=ev=>{if(ev.target.closest('.call'))return;openProfile(LIST[+r.dataset.idx]);});
+    renderList(top.map(r=>r.p),null,top.map(r=>r.uv),top.map(r=>r.snip));
   } else {
     document.getElementById('dList').innerHTML='<div class=”empty”>No matches yet.</div>';
   }
   show('detail');
-});
+}
 document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
 document.getElementById('pback').onclick=()=>show('detail');
 function show(v){document.getElementById('home').style.display=v==='home'?'block':'none';document.getElementById('detail').style.display=v==='detail'?'block':'none';document.getElementById('profile').style.display=v==='profile'?'block':'none';scrollTo(0,0)}
