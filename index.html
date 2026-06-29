@@ -336,6 +336,7 @@ function home(){
   document.getElementById('cats').innerHTML=DATA.categories.map((c,i)=>`<button class=”cat” data-i=”${i}”><div class=”ic” style=”--c:${col(c.name)}”>${ico(c.name)}</div><div><div class=”nm”>${c.name}</div><div class=”ct”>${c.count} ${c.count===1?'person':'people'}</div></div></button>`).join('');
   document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>openCat(DATA.categories[b.dataset.i]));
   document.getElementById('uvBtn').onclick=openUnverified;
+  show('home');
 }
 function setHead(cat,title,sub){const ih=document.getElementById('dIco');ih.style.setProperty('--c',col(cat));ih.innerHTML=ico(cat);document.getElementById('dTitle').textContent=title;document.getElementById('dSub').textContent=sub}
 function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'people'}`);renderList(c.contacts,c.name,false);show('detail')}
@@ -428,7 +429,7 @@ function doSearch(raw){
   }
   show('detail');
 }
-document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
+document.getElementById('back').onclick=()=>{document.getElementById('q').value='';home();};
 document.getElementById('pback').onclick=()=>show('detail');
 function show(v){document.getElementById('home').style.display=v==='home'?'block':'none';document.getElementById('detail').style.display=v==='detail'?'block':'none';document.getElementById('profile').style.display=v==='profile'?'block':'none';scrollTo(0,0)}
 const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
