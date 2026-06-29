@@ -174,7 +174,10 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .modal .merr{color:#C9453F;font-size:12.5px;font-weight:600;margin-top:10px;min-height:16px;text-align:center}
 .modal .mclose{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line);color:var(--faint);font-size:16px;display:grid;place-items:center}
 .modal .mclose:hover{color:var(--ink)}
-.gem-hint{display:block;font-size:0.8rem;font-style:italic;color:var(--faint);margin-top:8px;font-weight:500}
+.gem-hint{display:block;font-size:0.8rem;font-style:italic;color:var(--faint);margin:6px 0 12px;font-weight:500}
+.gem-boxes{display:flex;gap:12px;justify-content:center}
+.gem-box{width:3rem;height:3rem;text-align:center;font-size:1.5rem;font-weight:700;border-radius:8px;background:var(--bg);border:2px solid var(--line);color:var(--ink);outline:none;transition:border-color .15s,transform .15s;font-family:inherit}
+.gem-box:focus{border-color:var(--brand);transform:translateY(-2px)}
 /* user menu button */
 .ubtn{width:38px;height:38px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--soft);display:grid;place-items:center;font-size:18px;flex:none}
 .ubtn:hover{color:var(--brand);border-color:var(--brand)}
@@ -317,7 +320,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
     <form id="authForm">
       <div class="field"><label>Email</label><input type="email" id="authEmail" required placeholder="your@email.com"></div>
       <div class="field"><label>Password</label><input type="password" id="authPass" required placeholder="Min 6 characters" minlength="6"></div>
-      <div class="field" id="authGemField" style="display:none"><label>Group Gematria (3 digits)</label><input type="text" id="authGem" maxlength="3" inputmode="numeric" placeholder="Enter the gematria to verify"><span class="gem-hint">What is Klal Yisrael waiting for?</span></div>
+      <div class="field" id="authGemField" style="display:none"><label>Group Gematria (3 digits)</label><span class="gem-hint">What is Klal Yisrael waiting for?</span><div class="gem-boxes"><input type="text" maxlength="1" pattern="\d*" inputmode="numeric" class="gem-box" autocomplete="off"><input type="text" maxlength="1" pattern="\d*" inputmode="numeric" class="gem-box" autocomplete="off"><input type="text" maxlength="1" pattern="\d*" inputmode="numeric" class="gem-box" autocomplete="off"></div></div>
       <button type="submit" class="mbtn" id="authBtn">Create Account</button>
       <div class="merr" id="authErr"></div>
     </form>
@@ -589,6 +592,12 @@ function setAuthMode(mode){
   document.getElementById('authToggle').onclick=()=>setAuthMode(mode==='signup'?'login':'signup');
 }
 
+// Gem-box auto-focus
+document.querySelectorAll('.gem-box').forEach((box,i,all)=>{
+  box.addEventListener('input',()=>{box.value=box.value.replace(/[^0-9]/g,'').slice(0,1);if(box.value&&i<2)all[i+1].focus();});
+  box.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!box.value&&i>0)all[i-1].focus();});
+});
+
 authForm.onsubmit=async e=>{
   e.preventDefault();
   const email=document.getElementById('authEmail').value.trim();
@@ -599,7 +608,8 @@ authForm.onsubmit=async e=>{
   btn.disabled=true;
 
   if(authMode==='signup'){
-    const gem=document.getElementById('authGem').value.trim();
+    const gemBoxes=document.querySelectorAll('.gem-box');
+    const gem=(gemBoxes[0].value+gemBoxes[1].value+gemBoxes[2].value).trim();
     if(gem.length!==3){err.textContent='Please enter the 3-digit gematria.';btn.disabled=false;return;}
     try{
       await decrypt(gem);
