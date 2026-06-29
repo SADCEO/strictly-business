@@ -433,11 +433,13 @@ function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'pe
 function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class="ti ti-help-circle"></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);show('detail')}
 function mergeOverride(p){
   const o=window._overrideMap&&window._overrideMap[p.name];
-  if(!o)return p;
-  if(o.override_name)p._override_name=o.override_name;
-  if(o.override_category)p._override_category=o.override_category;
-  if(o.override_bio)p._override_bio=o.override_bio;
-  if(o.override_tags)p._override_tags=o.override_tags;
+  if(o){
+    if(o.override_name)p._override_name=o.override_name;
+    if(o.override_category)p._override_category=o.override_category;
+    if(o.override_bio)p._override_bio=o.override_bio;
+    if(o.override_tags)p._override_tags=o.override_tags;
+  }
+  if(p.name==='IT Tech')p._override_name='AdvancePC Tech - Leib Goldberg';
   return p;
 }
 function renderList(arr,cat,uv){
