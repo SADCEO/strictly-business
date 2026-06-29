@@ -218,6 +218,10 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .admin-item .ai-status.rejected{background:color-mix(in srgb,#C9453F 16%,transparent);color:#C9453F}
 .del-rec{width:34px;height:34px;border-radius:10px;border:1.5px solid #C9453F;background:transparent;color:#C9453F;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:15px;transition:background .15s}
 .del-rec:hover{background:color-mix(in srgb,#C9453F 12%,transparent)}
+.sms-verify{height:34px;padding:0 12px;border-radius:10px;border:1.5px solid #2A8C86;background:transparent;color:#2A8C86;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;text-decoration:none;transition:background .15s}
+.sms-verify:hover{background:color-mix(in srgb,#2A8C86 12%,transparent)}
+.pact-share{border-color:#2A8C86;color:#2A8C86}
+.pact-share:hover{background:color-mix(in srgb,#2A8C86 10%,transparent)}
 /* trainer modal */
 #trainer-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
 #trainer-overlay.active{opacity:1;pointer-events:auto}
@@ -284,8 +288,8 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   </div>
   <div id="pRecWrap"><div class="psec">Recommended for</div><div class="recfor" id="pRec"></div></div>
   <div class="pactions" id="pActions" style="display:none">
-    <button class="pact" id="claimBtn"><i class="ti ti-user-check"></i> Claim Profile</button>
     <button class="pact" id="correctBtn"><i class="ti ti-edit"></i> Suggest Correction</button>
+    <button class="pact pact-share" id="shareBtn"><i class="ti ti-share-2"></i> Share Profile</button>
     <button class="pact pact-admin" id="masterEditBtn" style="display:none"><i class="ti ti-shield-lock"></i> Master Edit</button>
   </div>
   <div id="pThreadWrap"><div class="psec">From the chat</div><div id="pThreads"></div></div>
@@ -309,12 +313,12 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   </div>
   <div class="set-card" id="adminCard" style="display:none">
     <div class="set-title">Administration</div>
-    <div class="set-row"><span>Manage claims & overrides</span><button class="mbtn" id="goAdminBtn" style="margin:0;width:auto;height:36px;padding:0 16px;font-size:12.5px;background:#C9453F"><i class="ti ti-shield-lock"></i> Admin Dashboard</button></div>
+    <div class="set-row"><span>Manage corrections & overrides</span><button class="mbtn" id="goAdminBtn" style="margin:0;width:auto;height:36px;padding:0 16px;font-size:12.5px;background:#C9453F"><i class="ti ti-shield-lock"></i> Admin Dashboard</button></div>
   </div>
 </section>
 <section id="admin">
   <button class="back" id="adminBack"><i class="ti ti-chevron-left"></i> Back</button>
-  <div class="dhead"><div class="ic" style="--c:#C9453F"><i class="ti ti-shield-lock"></i></div><div><h2>Admin Dashboard</h2><p>Manage claims & corrections</p></div></div>
+  <div class="dhead"><div class="ic" style="--c:#C9453F"><i class="ti ti-shield-lock"></i></div><div><h2>Admin Dashboard</h2><p>Manage corrections & claims</p></div></div>
   <div class="admin-tab">
     <button class="active" id="tabClaims">Profile Claims</button>
     <button id="tabCorrections">Corrections</button>
@@ -326,7 +330,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   <div class="modal">
     <button class="mclose" id="authClose"><i class="ti ti-x"></i></button>
     <h3 id="authTitle">Sign Up</h3>
-    <p class="msub" id="authSub">Create an account to claim profiles and suggest edits</p>
+    <p class="msub" id="authSub">Create an account to suggest edits</p>
     <form id="authForm">
       <div class="field"><label>Email</label><input type="email" id="authEmail" required placeholder="your@email.com"></div>
       <div class="field"><label>Password</label><input type="password" id="authPass" required placeholder="Min 6 characters" minlength="6"></div>
@@ -335,17 +339,6 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
       <div class="merr" id="authErr"></div>
     </form>
     <div class="mswitch" id="authSwitch">Already have an account? <a id="authToggle">Sign In</a></div>
-  </div>
-</div>
-<!-- Claim Modal -->
-<div class="modal-overlay" id="claimModal">
-  <div class="modal">
-    <button class="mclose" id="claimClose"><i class="ti ti-x"></i></button>
-    <h3>Claim this Profile</h3>
-    <p class="msub">Let the admins know this is you</p>
-    <p style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:16px" id="claimTarget"></p>
-    <button class="mbtn" id="claimSubmit"><i class="ti ti-send"></i> Submit Claim</button>
-    <div class="merr" id="claimErr"></div>
   </div>
 </div>
 <!-- Correction Modal -->
@@ -633,7 +626,7 @@ document.getElementById('authToggle').onclick=()=>{
 function setAuthMode(mode){
   authMode=mode;
   document.getElementById('authTitle').textContent=mode==='signup'?'Sign Up':'Sign In';
-  document.getElementById('authSub').textContent=mode==='signup'?'Create an account to claim profiles and suggest edits':'Welcome back';
+  document.getElementById('authSub').textContent=mode==='signup'?'Create an account to suggest edits':'Welcome back';
   document.getElementById('authBtn').textContent=mode==='signup'?'Create Account':'Sign In';
   document.getElementById('authSwitch').innerHTML=mode==='signup'?'Already have an account? <a id="authToggle">Sign In</a>':'Need an account? <a id="authToggle">Sign Up</a>';
   document.getElementById('authGemField').style.display=mode==='signup'?'block':'none';
@@ -714,20 +707,11 @@ document.getElementById('logoutBtn').onclick=async()=>{
   show('home');
 };
 
-// --- Claim & Correct ---
-const claimModal=document.getElementById('claimModal');
+// --- Correct & Share ---
 const correctModal=document.getElementById('correctModal');
-document.getElementById('claimClose').onclick=()=>claimModal.classList.remove('active');
-claimModal.onclick=e=>{if(e.target===claimModal)claimModal.classList.remove('active')};
 document.getElementById('correctClose').onclick=()=>correctModal.classList.remove('active');
 correctModal.onclick=e=>{if(e.target===correctModal)correctModal.classList.remove('active')};
 
-document.getElementById('claimBtn').onclick=()=>{
-  if(!currentUser){setAuthMode('signup');authModal.classList.add('active');return;}
-  document.getElementById('claimTarget').textContent='Claiming: '+window._currentViewedContact.name;
-  document.getElementById('claimErr').textContent='';
-  claimModal.classList.add('active');
-};
 document.getElementById('correctBtn').onclick=()=>{
   if(!currentUser){setAuthMode('signup');authModal.classList.add('active');return;}
   document.getElementById('correctTarget').textContent='Contact: '+window._currentViewedContact.name;
@@ -736,19 +720,19 @@ document.getElementById('correctBtn').onclick=()=>{
   correctModal.classList.add('active');
 };
 
-document.getElementById('claimSubmit').onclick=async()=>{
-  const btn=document.getElementById('claimSubmit');
-  btn.disabled=true;
-  const{error}=await supabase.from('profile_claims').insert({
-    user_id:currentUser.id,
-    requester_email:currentUser.email||null,
-    target_contact_name:window._currentViewedContact.name,
-    target_contact_category:window._currentViewedContact.category||null
-  });
-  if(error){document.getElementById('claimErr').textContent=error.message;btn.disabled=false;return;}
-  btn.disabled=false;
-  claimModal.classList.remove('active');
-  alert('Claim submitted! An admin will review it.');
+document.getElementById('shareBtn').onclick=async()=>{
+  const name=(window._currentViewedContact&&window._currentViewedContact.name)||'this contact';
+  const shareData={
+    title:'Strictly Business Directory',
+    text:'Hey! You were highly recommended in the Strictly Business private directory. Check out your profile here:',
+    url:window.location.origin
+  };
+  if(navigator.share){
+    try{await navigator.share(shareData);}catch(e){}
+  }else{
+    try{await navigator.clipboard.writeText(shareData.text+' '+shareData.url);alert('Link copied to clipboard!');}
+    catch(e){alert(shareData.text+' '+shareData.url);}
+  }
 };
 
 document.getElementById('correctSubmit').onclick=async()=>{
@@ -780,6 +764,20 @@ function updateAdminTabs(){
   document.getElementById('tabCorrections').classList.toggle('active',adminTab==='corrections');
 }
 
+function findPhoneByName(name){
+  if(!DATA)return'';
+  const n=name.toLowerCase();
+  for(const cat of DATA.categories){
+    const p=cat.contacts.find(c=>(c.name||'').toLowerCase()===n);
+    if(p&&p.phone)return p.phone;
+  }
+  if(DATA.unverified){
+    const p=DATA.unverified.find(c=>(c.name||'').toLowerCase()===n);
+    if(p&&p.phone)return p.phone;
+  }
+  return'';
+}
+
 async function loadAdmin(){
   if(!userProfile||userProfile.role!=='admin'){show('home');return;}
   const list=document.getElementById('adminList');
@@ -793,7 +791,11 @@ async function loadAdmin(){
       const email=c.requester_email?`<div class="ai-email">${esc(c.requester_email)}</div>`:'';
       const del=`<button class="del-rec" onclick="deleteRequestRecord('profile_claims','${c.id}')"><i class="ti ti-trash"></i></button>`;
       if(c.status!=='pending') return `<div class="admin-item"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-top"><span class="ai-status ${c.status}">${c.status}</span>${del}</div></div>`;
-      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button>${del}</div></div>`;
+      const vNote=c.verification_notes?`<div class="ai-note" style="font-style:italic;color:var(--brand)"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:middle;margin-right:4px"></i>${esc(c.verification_notes)}</div>`:'';
+      const phone=findPhoneByName(c.target_contact_name);
+      const smsBody=encodeURIComponent('Strictly Business Admin: Did you request to claim your directory profile using the email '+(c.requester_email||'unknown')+'? Reply YES to confirm.');
+      const sms=phone?`<a class="sms-verify" href="sms:${phone}?&body=${smsBody}"><i class="ti ti-message-forward"></i> Verify via SMS</a>`:'';
+      return `<div class="admin-item" data-id="${c.id}"><div class="ai-top"><span class="ai-name">${esc(c.target_contact_name)}</span><span class="ai-date">${dt}</span></div>${email}${vNote}<div class="ai-note">Category: ${esc(c.target_contact_category||'N/A')}</div><div class="ai-actions"><button class="approve" onclick="adminAction('profile_claims','${c.id}','approved')">Approve</button><button class="reject" onclick="adminAction('profile_claims','${c.id}','rejected')">Reject</button>${sms}${del}</div></div>`;
     }).join('');
   }else{
     const{data,error}=await supabase.from('correction_requests').select('*').order('created_at',{ascending:false});
@@ -978,7 +980,7 @@ supabase.auth.onAuthStateChange(async(event,session)=>{
     "Welcome to Strictly Business. Let\u2019s walk through how to use the directory.",
     "Smart Search: Type a name, a trade, or even a keyword like \u2018basement flood\u2019 to find the exact right person based on chat history.",
     "Profile & Evidence: Click any card to see a contact\u2019s full profile, who recommended them, and the exact chat thread where they were vouched for.",
-    "Community Driven: Use the Settings or Profile buttons to claim your own business or suggest corrections to keep the directory accurate."
+    "Community Driven: Use the Settings or Profile buttons to suggest corrections and keep the directory accurate."
   ];
   const ICONS=["ti-compass","ti-search","ti-user-search","ti-users-group"];
   let step=0;
