@@ -408,11 +408,9 @@ async function tryUnlock(pass,silent){
     DATA=await decrypt(pass);
     sessionStorage.setItem('sb-pass',pass);
     document.getElementById('lock').style.display='none';
-    home();
     buildSearchIndex();
-    loadOverrides();
-    if(!localStorage.getItem('has_seen_trainer')&&window._openTrainer) setTimeout(window._openTrainer,600);
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+    if(window._onDataReady) window._onDataReady();
   }catch(e){
     if(!silent){err.textContent='Not quite. Try again.';btn.disabled=false;btn.innerHTML='<i class="ti ti-lock-open"></i> Enter';clearBoxes();}
     else sessionStorage.removeItem('sb-pass');
@@ -575,10 +573,6 @@ let userProfile=null;
 async function initAuth(){
   const{data:{session}}=await supabase.auth.getSession();
   if(session) await setUser(session.user);
-  supabase.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session) await setUser(session.user);
-    else if(event==='SIGNED_OUT'){currentUser=null;userProfile=null;window.userProfile=null;updateUserBtn();}
-  });
 }
 
 async function setUser(user){
@@ -610,17 +604,27 @@ function updateUserBtn(){
 const authModal=document.getElementById('authModal');
 const authForm=document.getElementById('authForm');
 let authMode='signup';
+let authMandatory=false;
 
 document.getElementById('userBtn').onclick=()=>{
   if(currentUser){
     showSettings();
   }else{
+    authMandatory=false;
     setAuthMode('signup');
     authModal.classList.add('active');
+    document.getElementById('authClose').style.display='';
   }
 };
-document.getElementById('authClose').onclick=()=>authModal.classList.remove('active');
-authModal.onclick=e=>{if(e.target===authModal)authModal.classList.remove('active')};
+document.getElementById('authClose').onclick=()=>{if(!authMandatory)authModal.classList.remove('active')};
+authModal.onclick=e=>{if(e.target===authModal&&!authMandatory)authModal.classList.remove('active')};
+
+window._showMandatoryAuth=function(){
+  authMandatory=true;
+  setAuthMode('signup');
+  authModal.classList.add('active');
+  document.getElementById('authClose').style.display='none';
+};
 
 document.getElementById('authToggle').onclick=()=>{
   setAuthMode(authMode==='signup'?'login':'signup');
@@ -666,12 +670,18 @@ authForm.onsubmit=async e=>{
     if(error){err.textContent=error.message;btn.disabled=false;return;}
     await supabase.from('user_profiles').insert({id:data.user.id,role:'user',preferred_theme:localStorage.getItem('sb-theme')||'light'});
     await setUser(data.user);
+    localStorage.setItem('has_seen_trainer','true');
+    authMandatory=false;
     authModal.classList.remove('active');
+    if(DATA) enterApp();
   }else{
     const{data,error}=await supabase.auth.signInWithPassword({email,password:pass});
     if(error){err.textContent=error.message;btn.disabled=false;return;}
     await setUser(data.user);
+    localStorage.setItem('has_seen_trainer','true');
+    authMandatory=false;
     authModal.classList.remove('active');
+    if(DATA) enterApp();
   }
   btn.disabled=false;
   authForm.reset();
@@ -863,7 +873,42 @@ function checkAdminRoute(){
 window.addEventListener('hashchange',checkAdminRoute);
 
 // Init
-initAuth().then(()=>{checkAdminRoute()});
+function enterApp(){
+  if(!DATA) return;
+  home();
+  loadOverrides();
+  checkAdminRoute();
+}
+
+function gateUnauthenticated(){
+  if(!DATA) return;
+  if(!localStorage.getItem('has_seen_trainer')&&window._openTrainer){
+    setTimeout(window._openTrainer,300);
+  }else{
+    if(window._showMandatoryAuth) window._showMandatoryAuth();
+  }
+}
+
+window._onDataReady=function(){
+  if(currentUser){enterApp();}
+  else{gateUnauthenticated();}
+};
+
+initAuth().then(()=>{
+  if(DATA){
+    if(currentUser){enterApp();}
+    else{gateUnauthenticated();}
+  }
+});
+
+supabase.auth.onAuthStateChange(async(event,session)=>{
+  if(event==='SIGNED_IN'&&session){
+    await setUser(session.user);
+    if(DATA){enterApp();}
+  }else if(event==='SIGNED_OUT'){
+    currentUser=null;userProfile=null;window.userProfile=null;updateUserBtn();
+  }
+});
 })();
 </script>
 <div id="pwa-banner" role="dialog" aria-label="Install app">
@@ -957,7 +1002,7 @@ initAuth().then(()=>{checkAdminRoute()});
 
   function closeTrainer(){
     overlay.classList.remove('active');
-    localStorage.setItem('has_seen_trainer','true');
+    if(window._showMandatoryAuth) window._showMandatoryAuth();
   }
 
   nextBtn.onclick=()=>{
