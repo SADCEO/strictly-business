@@ -234,7 +234,7 @@ async function tryUnlock(pass,silent){
     DATA=await decrypt(pass);
     sessionStorage.setItem('sb-pass',pass);
     document.getElementById('lock').style.display='none';
-    home();
+    try{home();}catch(he){console.error('home render error',he);document.getElementById('cats').innerHTML='<div class="empty">Something went wrong — please reload the page.</div>';}
     try{buildIndex();}catch(ie){console.warn('search index build failed',ie);}
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }catch(e){
