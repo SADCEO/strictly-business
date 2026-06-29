@@ -220,6 +220,10 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .del-rec:hover{background:color-mix(in srgb,#C9453F 12%,transparent)}
 .sms-verify{height:34px;padding:0 12px;border-radius:10px;border:1.5px solid #2A8C86;background:transparent;color:#2A8C86;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;text-decoration:none;transition:background .15s}
 .sms-verify:hover{background:color-mix(in srgb,#2A8C86 12%,transparent)}
+.uv-banner{padding:14px 16px;margin-bottom:12px;border-radius:14px;background:color-mix(in srgb,var(--brand) 10%,transparent);border:1.5px solid color-mix(in srgb,var(--brand) 30%,transparent);font-size:13px;line-height:1.55;color:var(--ink);font-weight:500}
+.uv-banner i{color:var(--brand);margin-right:6px;font-size:16px;vertical-align:middle}
+.pact-share{border-color:#2A8C86;color:#2A8C86}
+.pact-share:hover{background:color-mix(in srgb,#2A8C86 10%,transparent)}
 /* trainer modal */
 #trainer-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
 #trainer-overlay.active{opacity:1;pointer-events:auto}
@@ -288,6 +292,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   <div class="pactions" id="pActions" style="display:none">
     <button class="pact" id="claimBtn"><i class="ti ti-user-check"></i> Claim Profile</button>
     <button class="pact" id="correctBtn"><i class="ti ti-edit"></i> Suggest Correction</button>
+    <button class="pact pact-share" id="shareBtn"><i class="ti ti-share-2"></i> Share Profile</button>
     <button class="pact pact-admin" id="masterEditBtn" style="display:none"><i class="ti ti-shield-lock"></i> Master Edit</button>
   </div>
   <div id="pThreadWrap"><div class="psec">From the chat</div><div id="pThreads"></div></div>
@@ -441,7 +446,7 @@ function home(){
 }
 function setHead(cat,title,sub){const ih=document.getElementById('dIco');ih.style.setProperty('--c',col(cat));ih.innerHTML=ico(cat);document.getElementById('dTitle').textContent=title;document.getElementById('dSub').textContent=sub}
 function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'people'}`);renderList(c.contacts,c.name,false);show('detail')}
-function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class="ti ti-help-circle"></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);show('detail')}
+function openUnverified(){const ih=document.getElementById('dIco');ih.style.setProperty('--c','#C98A1E');ih.innerHTML='<i class="ti ti-help-circle"></i>';document.getElementById('dTitle').textContent='Unsorted leads';document.getElementById('dSub').textContent=`${DATA.unverified.length} contacts`;renderList(DATA.unverified,null,true);document.getElementById('dList').insertAdjacentHTML('afterbegin','<div class="uv-banner"><i class="ti ti-users-group"></i> Help us build the directory! These contacts were pulled from 8 years of community WhatsApp recommendations. If you know a business here, click their card and share the link so they can claim and update their profile.</div>');show('detail')}
 function renderList(arr,cat,uv){
   LIST=arr;
   document.getElementById('dList').innerHTML=arr.map((p,i)=>row(p,i+1,cat||p.category,uv)).join('');
@@ -742,6 +747,21 @@ document.getElementById('correctBtn').onclick=()=>{
   correctModal.classList.add('active');
 };
 
+document.getElementById('shareBtn').onclick=async()=>{
+  const name=(window._currentViewedContact&&window._currentViewedContact.name)||'this contact';
+  const shareData={
+    title:'Strictly Business Directory',
+    text:'Hey! You were highly recommended in the Strictly Business private directory. Check out your profile and claim it here:',
+    url:window.location.origin
+  };
+  if(navigator.share){
+    try{await navigator.share(shareData);}catch(e){}
+  }else{
+    try{await navigator.clipboard.writeText(shareData.text+' '+shareData.url);alert('Link copied to clipboard!');}
+    catch(e){alert(shareData.text+' '+shareData.url);}
+  }
+};
+
 document.getElementById('claimSubmit').onclick=async()=>{
   const btn=document.getElementById('claimSubmit');
   btn.disabled=true;
@@ -1004,9 +1024,10 @@ supabase.auth.onAuthStateChange(async(event,session)=>{
     "Welcome to Strictly Business. Let\u2019s walk through how to use the directory.",
     "Smart Search: Type a name, a trade, or even a keyword like \u2018basement flood\u2019 to find the exact right person based on chat history.",
     "Profile & Evidence: Click any card to see a contact\u2019s full profile, who recommended them, and the exact chat thread where they were vouched for.",
+    "Community Driven: We have over 2,000 unsorted contacts from an 8-year WhatsApp chat. Check the Unsorted tab, and if you see someone you know, use the Share button to send them a link to claim their profile!",
     "Community Driven: Use the Settings or Profile buttons to claim your own business or suggest corrections to keep the directory accurate."
   ];
-  const ICONS=["ti-compass","ti-search","ti-user-search","ti-users-group"];
+  const ICONS=["ti-compass","ti-search","ti-user-search","ti-share-2","ti-users-group"];
   let step=0;
   const overlay=document.getElementById('trainer-overlay');
   const textEl=document.getElementById('trText');
