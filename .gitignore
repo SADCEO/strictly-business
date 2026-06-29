@@ -1,0 +1,6 @@
+# never publish plaintext data
+app_data.json
+contacts.json
+_chat.txt
+*.vcf
+data/
