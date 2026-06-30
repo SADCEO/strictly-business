@@ -367,12 +367,44 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   </div>
 </div>
 <script>
-const ICONS={"Real Estate":"ti-home","Legal":"ti-gavel","Construction / Contractor":"ti-backhoe","Landscaping / Lawn / Snow":"ti-plant-2","Plumbing":"ti-droplet","HVAC / Heating & AC":"ti-air-conditioning","Insurance":"ti-shield-half","Appliance Repair":"ti-wash-machine","Electrical":"ti-bolt","Accounting / Tax":"ti-calculator","IT / Computer / Web":"ti-device-laptop","Cleaning":"ti-spray","Printing / Signs / Promo":"ti-printer","Photography / Video":"ti-camera","Flooring":"ti-layout-grid","Catering / Food / Chef":"ti-tools-kitchen-2","Handyman":"ti-tool","Roofing / Gutters":"ti-home-2","Religious Services":"ti-star","Moving / Storage":"ti-truck-delivery","Medical / Dental / Therapy":"ti-stethoscope","Pest Control":"ti-bug","Auto Repair / Mechanic":"ti-car","Painting":"ti-paint","Graphic / Logo Design":"ti-palette","Mortgage":"ti-building-bank","Marketing / Social":"ti-speakerphone","Tires":"ti-disc","Towing / Roadside":"ti-truck","Locksmith":"ti-key","Auto Body / Glass":"ti-car-crash"};
+const ICONS={"Real Estate":"ti-home","Legal":"ti-gavel","Construction / Contractor":"ti-backhoe","Landscaping / Lawn / Snow":"ti-plant-2","Plumbing":"ti-droplet","HVAC / Heating & AC":"ti-air-conditioning","Insurance":"ti-shield-half","Appliance Repair":"ti-wash-machine","Electrical":"ti-bolt","Accounting / Tax":"ti-calculator","IT / Computer / Web":"ti-device-laptop","Cleaning":"ti-spray","Printing / Signs / Promo":"ti-printer","Photography / Video":"ti-camera","Flooring":"ti-layout-grid","Catering / Food / Chef":"ti-tools-kitchen-2","Handyman":"ti-tool","Roofing / Gutters":"ti-home-2","Religious Services":"ti-star","Moving / Storage":"ti-truck-delivery","Medical / Dental / Therapy":"ti-stethoscope","Pest Control":"ti-bug","Auto Repair / Mechanic":"ti-car","Painting":"ti-paint","Graphic / Logo Design":"ti-palette","Mortgage":"ti-building-bank","Marketing / Social":"ti-speakerphone","Tires":"ti-disc","Towing / Roadside":"ti-truck","Locksmith":"ti-key","Auto Body / Glass":"ti-car-crash","Recording / Audio":"ti-microphone-2"};
 const FG=["#D2552C","#3E8E4F","#3B6FC4","#A4499A","#C98A1E","#2A8C86","#C9453F","#6A52C7","#7C8A2E"];
 const col=c=>FG[[...(c||'')].reduce((a,ch)=>a+ch.charCodeAt(0),0)%FG.length];
 const ico=c=>`<i class="ti ${ICONS[c]||'ti-point'}"></i>`;
 const initials=n=>(n||'?').replace(/[^a-zA-Z ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 let DATA=null,LIST=[];
+
+/* --- manual / admin-curated contact placements ---
+   Category placement lives in the data layer. contact_overrides (Supabase) only
+   re-labels an existing card; it can't add a contact to multiple categories or
+   create a category, so curated multi-category listings are injected here. */
+const MANUAL_CONTACTS=[{
+  base:{name:'Akiva Cohen',phone:'8482859928',phone_fmt:'(848) 285-9928',first:'2025-11-27',last:'2026-03-19',mentions:2,score:2,manual:true},
+  placements:[
+    {category:'Recording / Audio',vouchers:1,confidence:'high',asks:['recording studio'],
+      threads:[{asker:'Sb Mordy Lang King Construction',question:'Who does recording studio? In lkwd area',date:'Mar 2026',by:'Rabbi Bardugo',said:'Akivah Cohen +1 (848) 285-9928'}]},
+    {category:'IT / Computer / Web',vouchers:0,confidence:'likely',asks:['IT / tech support'],threads:[]},
+    {category:'Photography / Video',vouchers:0,confidence:'likely',asks:['video','photography'],threads:[]}
+  ]
+}];
+function injectManualContacts(){
+  if(!DATA||DATA._manualInjected)return; DATA._manualInjected=true;
+  const byName=Object.create(null); DATA.categories.forEach(c=>byName[c.name]=c);
+  MANUAL_CONTACTS.forEach(mc=>{
+    const ph=mc.base.phone;
+    if(Array.isArray(DATA.unverified)) DATA.unverified=DATA.unverified.filter(p=>p.phone!==ph);
+    mc.placements.forEach(pl=>{
+      let cat=byName[pl.category];
+      if(!cat){cat={name:pl.category,count:0,contacts:[]};DATA.categories.push(cat);byName[pl.category]=cat;}
+      cat.contacts=cat.contacts.filter(p=>p.phone!==ph);
+      const rec=Object.assign({},mc.base,{category:pl.category,vouchers:pl.vouchers,confidence:pl.confidence,asks:pl.asks||[],threads:pl.threads||[],trades:[]});
+      cat.contacts.push(rec);
+      cat.contacts.sort((a,b)=>(b.score||0)-(a.score||0)||(b.vouchers||0)-(a.vouchers||0));
+      cat.count=cat.contacts.length;
+    });
+  });
+  if(DATA.stats){DATA.stats.categories=DATA.categories.length;}
+}
 
 /* theme */
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('tgl').innerHTML=`<i class="ti ti-${t==='dark'?'sun':'moon'}"></i>`;const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#171310':'#FBF4EC')}
@@ -399,6 +431,7 @@ async function tryUnlock(pass,silent){
   if(!silent){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2"></i> Unlocking…';}
   try{
     DATA=await decrypt(pass);
+    injectManualContacts();
     sessionStorage.setItem('sb-pass',pass);
     document.getElementById('lock').style.display='none';
     buildSearchIndex();
@@ -454,7 +487,8 @@ function row(p,rk,cat,uv){
   const asks=displayTags.slice(0,3).map(a=>`<span class="ask">${esc(a)}</span>`).join('');
   const bd=p.confidence==='high'?'<span class="bd c"><i class="ti ti-rosette-discount-check" style="font-size:12px"></i>Confirmed</span>':'<span class="bd l">Likely</span>';
   const tel=p.phone?`<a class="call" href="tel:${p.phone}"><i class="ti ti-phone"></i>Call</a>`:'';
-  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(displayName)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(displayName)}</span>${bd}</div><div class="rm"><b>${p.vouchers}</b> vouched${p.last?' · '+p.last.slice(0,4):''}</div>${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
+  const meta=(p.vouchers>0)?('<b>'+p.vouchers+'</b> vouched'+(p.last?' · '+p.last.slice(0,4):'')):'';
+  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(displayName)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(displayName)}</span>${bd}</div>${meta?`<div class="rm">${meta}</div>`:''}${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
 }
 function openProfile(p){
   mergeOverride(p);
