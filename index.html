@@ -26,10 +26,10 @@ button,a{font-family:inherit;color:inherit;text-decoration:none;cursor:pointer;b
 .ti{font-size:inherit}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:calc(14px + env(safe-area-inset-top)) 0 12px;overflow:visible}
-header::after{content:'';position:absolute;left:0;right:0;bottom:-24px;height:24px;background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 72%,transparent),transparent);pointer-events:none;z-index:1}
+header::after{content:'';position:absolute;left:0;right:0;bottom:-40px;height:40px;background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 85%,transparent),transparent);pointer-events:none;z-index:1}
 .top{display:flex;align-items:center;gap:11px}
 .logo{width:80px;height:80px;flex:none;display:grid;place-items:center;cursor:pointer}
-.logo img{clip-path:inset(22% 3% 23% 3% round 10px);transform:scale(1.4);transform-origin:center}
+:root[data-theme="dark"] .logo img{-webkit-mask-image:radial-gradient(ellipse 76% 72% at 50% 50%,black 52%,transparent 90%);mask-image:radial-gradient(ellipse 76% 72% at 50% 50%,black 52%,transparent 90%)}
 .top h1{font-size:18.5px;font-weight:800;letter-spacing:-.02em}
 .top .tag{font-size:11.5px;color:var(--soft);margin-top:1px;font-weight:500}
 .tgl{margin-left:auto;width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--soft);display:grid;place-items:center;font-size:18px;flex:none}
