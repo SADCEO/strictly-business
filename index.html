@@ -462,6 +462,35 @@ function injectManualContacts(){
   if(DATA.stats){DATA.stats.categories=DATA.categories.length;}
 }
 
+const MIN_VOUCHES_TO_SORT=1;
+function promoteUnsorted(){
+  if(!DATA||!Array.isArray(DATA.unverified))return;
+  const byName=Object.create(null); DATA.categories.forEach(c=>byName[c.name]=c);
+  const touched=new Set(),keep=[];
+  let moved=0;
+  DATA.unverified.forEach(p=>{
+    const best=(p.trades||[]).filter(t=>t&&t.category).sort((a,b)=>(b.vouchers||0)-(a.vouchers||0))[0];
+    const catName=(p.category&&!/^(unknown|other|unsorted|uncategori[sz]ed)$/i.test(p.category))?p.category:(best&&best.category);
+    const votes=Math.max(p.vouchers||0,best&&best.category===catName?(best.vouchers||0):0);
+    if(!catName||votes<MIN_VOUCHES_TO_SORT){keep.push(p);return;}
+    let cat=byName[catName];
+    if(!cat){cat={name:catName,count:0,contacts:[]};DATA.categories.push(cat);byName[catName]=cat;}
+    if(p.phone&&cat.contacts.some(c=>c.phone===p.phone))return;
+    cat.contacts.push(Object.assign(p,{category:catName,vouchers:votes}));
+    touched.add(cat);moved++;
+  });
+  touched.forEach(cat=>{
+    cat.contacts.sort((a,b)=>(b.score||0)-(a.score||0)||(b.vouchers||0)-(a.vouchers||0));
+    cat.count=cat.contacts.length;
+  });
+  DATA.unverified=keep;
+  if(DATA.stats){
+    DATA.stats.categories=DATA.categories.length;
+    DATA.stats.unverified=keep.length;
+    if(typeof DATA.stats.listed==='number')DATA.stats.listed+=moved;
+  }
+}
+
 /* theme */
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.getElementById('tgl').innerHTML=`<i class="ti ti-${t==='dark'?'sun':'moon'}"></i>`;const m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#171310':'#FBF4EC')}
 applyTheme(localStorage.getItem('sb-theme')||'light');
@@ -488,6 +517,7 @@ async function tryUnlock(pass,silent){
   try{
     DATA=await decrypt(pass);
     injectManualContacts();
+    promoteUnsorted();
     sessionStorage.setItem('sb-pass',pass);
     document.getElementById('lock').style.display='none';
     buildSearchIndex();
