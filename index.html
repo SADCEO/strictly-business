@@ -20,13 +20,11 @@
 :root[data-theme="dark"]{--bg:#09090F;--card:rgba(14,16,30,0.90);--card2:rgba(18,20,36,0.90);--ink:#E4E8FF;--soft:#8B92C0;--faint:#4A5178;--line:rgba(99,102,241,0.22);--brand:#F07050;--brand-ink:#fff;--shadow:0 20px 60px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.30);--shadow2:0 28px 72px rgba(0,0,0,.70),0 0 50px rgba(79,70,229,.14)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:var(--bg);max-width:1180px;margin:0 auto;padding:0 18px 0}
-body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 90% 55% at 15% -5%,rgba(79,70,229,.14) 0%,transparent 60%),radial-gradient(ellipse 60% 45% at 85% 95%,rgba(124,58,237,.11) 0%,transparent 60%)}
-:root[data-theme="dark"] body::before{background:radial-gradient(ellipse 90% 55% at 15% -5%,rgba(79,70,229,.35) 0%,transparent 60%),radial-gradient(ellipse 60% 45% at 85% 95%,rgba(124,58,237,.28) 0%,transparent 60%),radial-gradient(ellipse 40% 35% at 55% 50%,rgba(37,99,235,.12) 0%,transparent 65%)}
 button,a{font-family:inherit;color:inherit;text-decoration:none;cursor:pointer;border:none;background:none}
 .ti{font-size:inherit}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 header{position:sticky;top:0;z-index:20;padding:calc(14px + env(safe-area-inset-top)) 0 12px;overflow:visible;isolation:isolate}
-header::before{content:'';position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);-webkit-mask-image:linear-gradient(to bottom,black 55%,transparent 100%);mask-image:linear-gradient(to bottom,black 55%,transparent 100%)}
+header::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--bg)}
 .top{display:flex;align-items:center;gap:11px}
 .logo{width:80px;height:80px;flex:none;display:grid;place-items:center;cursor:pointer}
 :root[data-theme="dark"] .logo img{-webkit-mask-image:radial-gradient(ellipse 76% 72% at 50% 50%,black 52%,transparent 90%);mask-image:radial-gradient(ellipse 76% 72% at 50% 50%,black 52%,transparent 90%)}
