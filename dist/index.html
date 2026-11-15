@@ -512,7 +512,7 @@ function home(){
   const s=DATA.stats;
   document.getElementById('stats').innerHTML=`<div class="stat"><b>${s.listed.toLocaleString()}</b><span>RECOMMENDED</span></div><div class="stat"><b>${s.categories}</b><span>TRADES</span></div><div class="stat"><b>8 yrs</b><span>OF CHAT</span></div>`;
   document.getElementById('trc').textContent=`${DATA.categories.length} trades`;
-  document.getElementById('uvCt').textContent=`${s.unverified.toLocaleString()} contacts`;
+  document.getElementById('uvCt').textContent=`${DATA.unverified.length.toLocaleString()} contacts`;
   document.getElementById('uvBtn').onclick=openUnverified;
   initCoverFlow(DATA.categories);
 }
