@@ -1,7 +1,7 @@
 // Offline app shell for Strictly Business.
 // HTML + data: network-first (always get the latest), cache as offline fallback.
 // Static assets (icons): cache-first.
-const CACHE = 'sb-v10';
+const CACHE = 'sb-v11';
 const SHELL = [
   './', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './apple-touch-icon.png',
