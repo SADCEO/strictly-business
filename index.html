@@ -109,6 +109,12 @@ header::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--
 .pav{width:88px;height:88px;border-radius:50%;margin:0 auto 16px;display:grid;place-items:center;font-weight:800;font-size:32px;color:#fff;background:var(--c);box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--c),0 12px 32px rgba(0,0,0,.2)}
 .pname{font-size:25px;font-weight:800;letter-spacing:-.02em}
 .pcat{margin-top:10px;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;padding:6px 14px;border-radius:30px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c)}
+.pcat.link{cursor:pointer;transition:background .2s,transform .2s}
+.pcat.link:hover{background:color-mix(in srgb,var(--c) 26%,transparent)}
+.pcat.link:active{transform:scale(.96)}
+.pcat.link:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.pcat-go{font-size:14px;margin-left:-2px;transition:transform .2s}
+.pcat.link:hover .pcat-go{transform:translateX(2px)}
 .pstats{display:flex;margin:22px 0 4px;border:1px solid var(--line);border-radius:18px;background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
 .ps{flex:1;padding:15px 8px;text-align:center}.ps+.ps{border-left:1px solid var(--line)}
 .ps b{font-size:22px;font-weight:800;display:block;letter-spacing:-.02em}
@@ -806,7 +812,13 @@ function openProfile(p){
   const c=col(displayCategory);
   const av=document.getElementById('pAv');av.style.setProperty('--c',c);av.textContent=initials(displayName);
   document.getElementById('pName').textContent=displayName;
-  const pc=document.getElementById('pCat');pc.style.setProperty('--c',c);pc.innerHTML=`${ico(displayCategory)}<span>${esc(displayCategory)}</span>`;
+  const pc=document.getElementById('pCat');pc.style.setProperty('--c',c);
+  const catObj=DATA.categories.find(x=>x.name===displayCategory);
+  pc.innerHTML=`${ico(displayCategory)}<span>${esc(displayCategory)}</span>${catObj?'<i class="ti ti-chevron-right pcat-go"></i>':''}`;
+  pc.classList.toggle('link',!!catObj);
+  pc.onclick=catObj?()=>openCat(catObj):null;
+  pc.onkeydown=catObj?e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openCat(catObj)}}:null;
+  if(catObj){pc.setAttribute('role','button');pc.tabIndex=0;pc.title='See everyone in '+displayCategory}else{pc.removeAttribute('role');pc.removeAttribute('tabindex');pc.removeAttribute('title')}
   const yrs=p.first&&p.last?(p.first.slice(0,4)===p.last.slice(0,4)?p.first.slice(0,4):p.first.slice(0,4)+'–'+p.last.slice(0,4)):'—';
   document.getElementById('pStats').innerHTML=`<div class="ps"><b>${p.vouchers}</b><span>VOUCHES</span></div><div class="ps"><b>${p.mentions}</b><span>MENTIONS</span></div><div class="ps"><b>${yrs}</b><span>ACTIVE</span></div>`;
   const call=document.getElementById('pCall');if(p.phone){call.style.display='flex';call.href='tel:'+p.phone;call.querySelector('span').textContent='Call '+p.phone_fmt}else call.style.display='none';
