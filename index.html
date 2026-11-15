@@ -88,6 +88,10 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .bd.c{background:color-mix(in srgb,#3E8E4F 16%,transparent);color:#3E8E4F}
 .bd.l{background:color-mix(in srgb,#C98A1E 16%,transparent);color:#C98A1E}
 .mc-dot{width:8px;height:8px;border-radius:50%;background:#7B52E8;flex:none;display:inline-block;margin-left:1px;vertical-align:middle}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:14px;padding:8px 12px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);font-size:11.5px;font-weight:600;color:var(--soft)}
+.legend>span{display:inline-flex;align-items:center;gap:6px}
+.legend .bd{font-size:10px;padding:2px 7px}
+.legend+.list{margin-top:10px}
 .rm{font-size:12.5px;color:var(--soft);margin-top:5px;font-weight:600}.rm b{color:var(--ink)}
 .asks{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}
 .ask{font-size:11.5px;font-weight:600;color:var(--soft);background:var(--bg);border:1.5px solid var(--line);padding:4px 10px;border-radius:30px}
@@ -306,6 +310,8 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
   .cf-lbl-name{font-size:14.5px}
   .cf-lbl-sub{font-size:10.5px}
   .cf-contacts{padding:8px 0 20px}
+  .legend{margin-top:6px;padding:6px 10px;gap:4px 10px;font-size:10.5px;border-radius:12px}
+  .cf-contacts>.legend{margin-top:0}
 }
 </style><meta property="og:image" content="https://bolt.new/static/og_default.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://bolt.new/static/og_default.png"></head>
 <body>
@@ -348,7 +354,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
     </div>
   </div>
   <div class="cf-contacts" id="cf-contacts">
-    <div class="list" id="cf-list"></div>
+    <div class="legend" aria-label="What the colors mean"><span><span class="bd c"><i class="ti ti-rosette-discount-check" style="font-size:11px"></i>Confirmed</span>Recommended by the group</span><span><span class="bd l">Likely</span>Mentioned, not yet confirmed</span><span><span class="mc-dot"></span>Works in more than one trade</span></div><div class="list" id="cf-list"></div>
     <div class="sl">Still being sorted</div>
     <button class="uv" id="uvBtn"><div class="ic"><i class="ti ti-help-circle"></i></div>
       <div><div class="nm">Unsorted leads</div><div class="ds" id="uvCt"></div></div>
@@ -361,7 +367,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 <section id="detail">
   <button class="back" id="back"><i class="ti ti-chevron-left"></i> Back</button>
   <div class="dhead"><div class="ic" id="dIco"></div><div><h2 id="dTitle"></h2><p id="dSub"></p></div></div>
-  <div class="list" id="dList"></div>
+  <div class="legend" aria-label="What the colors mean"><span><span class="bd c"><i class="ti ti-rosette-discount-check" style="font-size:11px"></i>Confirmed</span>Recommended by the group</span><span><span class="bd l">Likely</span>Mentioned, not yet confirmed</span><span><span class="mc-dot"></span>Works in more than one trade</span></div><div class="list" id="dList"></div>
 </section>
 <section id="profile">
   <button class="back" id="pback"><i class="ti ti-chevron-left"></i> Back</button>
