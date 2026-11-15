@@ -278,6 +278,35 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .cf-contacts .sl{margin:24px 4px 14px}
 .cf-contacts .uv{margin-top:0}
 .cf-contacts footer{margin-top:16px}
+@media(max-width:599px){
+  header{padding:calc(6px + env(safe-area-inset-top)) 0 8px}
+  .top{gap:8px}
+  .logo{width:44px;height:44px}
+  .top h1{font-size:16px}
+  .top .tag{font-size:10.5px}
+  .tgl,.ubtn{width:34px;height:34px;font-size:16px;border-radius:10px}
+  .search{margin-top:8px}
+  .search input{height:42px;border-radius:14px;font-size:14px;padding-left:40px}
+  .search::before{border-radius:16px}
+  .search > i{left:14px;font-size:17px}
+  .hero{padding:8px 0 0}
+  .stats{gap:6px;margin-top:0}
+  .stat{display:flex;align-items:baseline;justify-content:center;gap:5px;padding:7px 6px;border-radius:12px;border-width:1.5px}
+  .stat b{font-size:15px;display:inline}
+  .stat span{font-size:9.5px;margin-top:0;display:inline}
+  .cf-wrapper{padding-bottom:4px}
+  .cf-wrapper .sl{margin:8px 2px 4px;font-size:14px}
+  .cf{height:132px}
+  .cc{width:112px;height:116px;border-radius:18px;padding:10px;gap:5px}
+  .cc-icon{font-size:1.4rem}
+  .cc-name{font-size:11.5px}
+  .cc-ct{font-size:10px}
+  .cf-dots{padding:4px 0 0}
+  .cf-lbl{padding:4px 12px}
+  .cf-lbl-name{font-size:14.5px}
+  .cf-lbl-sub{font-size:10.5px}
+  .cf-contacts{padding:8px 0 20px}
+}
 </style><meta property="og:image" content="https://bolt.new/static/og_default.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://bolt.new/static/og_default.png"></head>
 <body>
 <div id="lock">
@@ -603,10 +632,12 @@ function initCoverFlow(cats){
   }
   driver.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(frame);},{passive:true,signal});
   document.getElementById('cf-lbl').onclick=()=>{if(CF_CATS[CF_active])openCat(CF_CATS[CF_active]);};
-  setTimeout(()=>{
-    const hdr=document.querySelector('header');
-    if(hdr)document.documentElement.style.setProperty('--hdr-h',hdr.offsetHeight+'px');
-  },50);
+  const hdr=document.querySelector('header');
+  if(hdr){
+    const hro=new ResizeObserver(()=>document.documentElement.style.setProperty('--hdr-h',hdr.offsetHeight+'px'));
+    hro.observe(hdr);
+    signal.addEventListener('abort',()=>hro.disconnect());
+  }
   driver.scrollLeft=0;frame();
   renderCFContacts(cats[0]);
 }
