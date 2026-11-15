@@ -256,7 +256,6 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .cf-driver{position:absolute;inset:0;z-index:3;overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
 .cf-driver::-webkit-scrollbar{display:none}
 .cf-slots{display:flex;height:100%}
-.cf-slot-sp{flex:0 0 calc(50vw - 40px);height:100%}
 .cf-slot{flex:0 0 80px;scroll-snap-align:center;height:100%}
 .cf-stage{position:absolute;inset:0;z-index:2;pointer-events:none;perspective:750px}
 .cc{position:absolute;width:155px;height:158px;left:50%;top:50%;transform:translateX(calc(-50% + var(--tx,0px))) translateY(-50%) rotateY(calc(var(--ry,0)*1deg)) scale(var(--sc,1));opacity:var(--op,1);transform-origin:center center;background:var(--card);border:2px solid var(--line);border-radius:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;text-align:center;transition:border-color .25s,box-shadow .25s;will-change:transform,opacity}
@@ -530,9 +529,10 @@ function initCoverFlow(cats){
   if(!driver||!slotsEl||!stage||!dotsEl)return;
   slotsEl.innerHTML='';stage.innerHTML='';dotsEl.innerHTML='';
   const SLOT_W=80;
-  const spL=document.createElement('div');spL.className='cf-slot-sp';slotsEl.appendChild(spL);
+  const spW=Math.max(0,Math.floor(driver.clientWidth/2-SLOT_W/2))+'px';
+  const spL=document.createElement('div');spL.style.cssText=`flex:0 0 ${spW};width:${spW};height:100%`;slotsEl.appendChild(spL);
   cats.forEach(()=>{const s=document.createElement('div');s.className='cf-slot';slotsEl.appendChild(s);});
-  const spR=document.createElement('div');spR.className='cf-slot-sp';slotsEl.appendChild(spR);
+  const spR=document.createElement('div');spR.style.cssText=`flex:0 0 ${spW};width:${spW};height:100%`;slotsEl.appendChild(spR);
   const cards=cats.map((cat,i)=>{
     const c=document.createElement('div');c.className='cc';
     c.innerHTML=`<div class="cc-icon">${ico(cat.name)}</div><div class="cc-name">${esc(cat.name)}</div><div class="cc-ct">${cat.count} ${cat.count===1?'person':'people'}</div>`;
