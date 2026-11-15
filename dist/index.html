@@ -222,6 +222,17 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .sms-verify:hover{background:color-mix(in srgb,#2A8C86 12%,transparent)}
 .pact-share{border-color:#2A8C86;color:#2A8C86}
 .pact-share:hover{background:color-mix(in srgb,#2A8C86 10%,transparent)}
+/* update toast */
+#upd-toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(100px);z-index:95;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);padding:12px 14px 12px 16px;border-radius:50px;box-shadow:0 8px 28px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:transform .36s cubic-bezier(.34,1.42,.64,1),opacity .28s;white-space:nowrap;max-width:calc(100vw - 36px)}
+#upd-toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+#upd-toast i{font-size:18px;flex:none;animation:updSpin 1.4s linear infinite;animation-play-state:paused}
+#upd-toast.show i{animation-play-state:running}
+@keyframes updSpin{to{transform:rotate(360deg)}}
+#upd-toast span{font-size:13.5px;font-weight:700;flex:1}
+#upd-reload{height:32px;padding:0 14px;border-radius:30px;background:var(--brand);color:var(--brand-ink);font-size:12.5px;font-weight:700;flex:none;white-space:nowrap;transition:opacity .15s}
+#upd-reload:hover{opacity:.88}
+#upd-dismiss{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.12);color:inherit;font-size:14px;display:grid;place-items:center;flex:none;margin-left:2px}
+#upd-dismiss:hover{background:rgba(255,255,255,.22)}
 /* trainer modal */
 #trainer-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
 #trainer-overlay.active{opacity:1;pointer-events:auto}
@@ -235,6 +246,34 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 #trainer-modal .tr-next{width:100%;height:48px;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s}
 #trainer-modal .tr-skip{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg);border:1.5px solid var(--line);color:var(--faint);font-size:16px;display:grid;place-items:center}
 #trainer-modal .tr-skip:hover{color:var(--ink)}
+/* ── Cover flow ── */
+#home{height:calc(100dvh - var(--hdr-h,110px));overflow:hidden;min-height:0}
+.cf-wrapper{flex:0 0 auto;background:var(--bg);padding-bottom:6px;border-bottom:2px solid var(--line)}
+.cf-wrapper .sl{margin:14px 4px 10px}
+.cf{position:relative;height:194px;overflow:hidden}
+.cf-driver{position:absolute;inset:0;z-index:3;overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
+.cf-driver::-webkit-scrollbar{display:none}
+.cf-slots{display:flex;padding:0 calc(50% - 40px);height:100%}
+.cf-slot{flex:0 0 80px;scroll-snap-align:center;height:100%}
+.cf-stage{position:absolute;inset:0;z-index:2;pointer-events:none;perspective:750px}
+.cc{position:absolute;width:155px;height:158px;left:50%;top:50%;transform:translateX(calc(-50% + var(--tx,0px))) translateY(-50%) rotateY(calc(var(--ry,0)*1deg)) scale(var(--sc,1));opacity:var(--op,1);transform-origin:center center;background:var(--card);border:2px solid var(--line);border-radius:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;text-align:center;transition:border-color .25s,box-shadow .25s;will-change:transform,opacity}
+.cc.active{border-color:color-mix(in srgb,var(--brand) 45%,var(--line));box-shadow:0 8px 24px rgba(40,33,27,.12),0 20px 48px rgba(40,33,27,.08)}
+.cc-icon{font-size:1.8rem;line-height:1}
+.cc-name{font-size:12.5px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+.cc-ct{font-size:11px;color:var(--soft);font-weight:600}
+.cf-dots{display:flex;justify-content:center;gap:4px;padding:8px 0 2px}
+.cf-dot{width:5px;height:5px;border-radius:50%;background:var(--faint);transition:width .3s,background .3s}
+.cf-dot.on{width:18px;border-radius:3px;background:var(--brand)}
+.cf-lbl{text-align:center;padding:6px 18px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cf-lbl:active{opacity:.7}
+.cf-lbl-name{font-size:16px;font-weight:800;letter-spacing:-.02em}
+.cf-lbl-sub{font-size:11px;color:var(--soft);font-weight:500;margin-top:1px}
+.cf-contacts{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding:12px 0 24px}
+.cf-contacts::-webkit-scrollbar{display:none}
+.cf-contacts .list{margin-top:0}
+.cf-contacts .sl{margin:24px 4px 14px}
+.cf-contacts .uv{margin-top:0}
+.cf-contacts footer{margin-top:16px}
 </style></head>
 <body>
 <div id="lock">
@@ -263,15 +302,28 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 </header>
 <main id="home">
   <div class="hero"><div class="stats" id="stats"></div></div>
-  <div class="sl">Browse by trade <span class="mut" id="trc"></span></div>
-  <div class="cats" id="cats"></div>
-  <div class="sl">Still being sorted</div>
-  <button class="uv" id="uvBtn"><div class="ic"><i class="ti ti-help-circle"></i></div>
-    <div><div class="nm">Unsorted leads</div><div class="ds" id="uvCt"></div></div>
-    <div class="ar"><i class="ti ti-chevron-right"></i></div></button>
-  <footer>
-    <div class="foot-copy">&copy; 2026 <a href="https://strict.business" target="_blank" rel="noopener">strict.business</a> &mdash; All rights reserved.</div>
-  </footer>
+  <div class="cf-wrapper" id="cf-wrapper">
+    <div class="sl">Browse by trade <span class="mut" id="trc"></span></div>
+    <div class="cf" id="cf">
+      <div class="cf-driver" id="cf-driver"><div class="cf-slots" id="cf-slots"></div></div>
+      <div class="cf-stage" id="cf-stage"></div>
+    </div>
+    <div class="cf-dots" id="cf-dots"></div>
+    <div class="cf-lbl" id="cf-lbl">
+      <div class="cf-lbl-name" id="cf-lblN"></div>
+      <div class="cf-lbl-sub" id="cf-lblS"></div>
+    </div>
+  </div>
+  <div class="cf-contacts" id="cf-contacts">
+    <div class="list" id="cf-list"></div>
+    <div class="sl">Still being sorted</div>
+    <button class="uv" id="uvBtn"><div class="ic"><i class="ti ti-help-circle"></i></div>
+      <div><div class="nm">Unsorted leads</div><div class="ds" id="uvCt"></div></div>
+      <div class="ar"><i class="ti ti-chevron-right"></i></div></button>
+    <footer>
+      <div class="foot-copy">&copy; 2026 <a href="https://strict.business" target="_blank" rel="noopener">strict.business</a> &mdash; All rights reserved.</div>
+    </footer>
+  </div>
 </main>
 <section id="detail">
   <button class="back" id="back"><i class="ti ti-chevron-left"></i> Back</button>
@@ -457,9 +509,75 @@ function home(){
   document.getElementById('stats').innerHTML=`<div class="stat"><b>${s.listed.toLocaleString()}</b><span>RECOMMENDED</span></div><div class="stat"><b>${s.categories}</b><span>TRADES</span></div><div class="stat"><b>8 yrs</b><span>OF CHAT</span></div>`;
   document.getElementById('trc').textContent=`${DATA.categories.length} trades`;
   document.getElementById('uvCt').textContent=`${s.unverified.toLocaleString()} contacts`;
-  document.getElementById('cats').innerHTML=DATA.categories.map((c,i)=>`<button class="cat" data-i="${i}"><div class="ic" style="--c:${col(c.name)}">${ico(c.name)}</div><div><div class="nm">${c.name}</div><div class="ct">${c.count} ${c.count===1?'person':'people'}</div></div></button>`).join('');
-  document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>openCat(DATA.categories[b.dataset.i]));
   document.getElementById('uvBtn').onclick=openUnverified;
+  initCoverFlow(DATA.categories);
+}
+/* -- Cover Flow -------------------------------------------------- */
+let CF_CATS=[],CF_active=0,_cfAbort=null;
+function initCoverFlow(cats){
+  CF_CATS=cats;
+  if(!cats||!cats.length)return;
+  if(_cfAbort)_cfAbort.abort();
+  _cfAbort=new AbortController();
+  const signal=_cfAbort.signal;
+  const driver=document.getElementById('cf-driver');
+  const slotsEl=document.getElementById('cf-slots');
+  const stage=document.getElementById('cf-stage');
+  const dotsEl=document.getElementById('cf-dots');
+  if(!driver||!slotsEl||!stage||!dotsEl)return;
+  slotsEl.innerHTML='';stage.innerHTML='';dotsEl.innerHTML='';
+  const SLOT_W=80;
+  cats.forEach(()=>{const s=document.createElement('div');s.className='cf-slot';slotsEl.appendChild(s);});
+  const cards=cats.map((cat,i)=>{
+    const c=document.createElement('div');c.className='cc';
+    c.innerHTML=`<div class="cc-icon">${ico(cat.name)}</div><div class="cc-name">${esc(cat.name)}</div><div class="cc-ct">${cat.count} ${cat.count===1?'person':'people'}</div>`;
+    c.addEventListener('click',()=>{if(Math.round(driver.scrollLeft/SLOT_W)!==i)driver.scrollTo({left:i*SLOT_W,behavior:'smooth'});});
+    stage.appendChild(c);return c;
+  });
+  cats.forEach(()=>{const d=document.createElement('div');d.className='cf-dot';dotsEl.appendChild(d);});
+  const dotEls=Array.from(dotsEl.children);
+  let lastActive=-1,raf=null;
+  function frame(){
+    raf=null;
+    const frac=driver.scrollLeft/SLOT_W,snap=Math.round(frac);
+    cards.forEach((card,i)=>{
+      const t=i-frac,at=Math.abs(t);
+      card.style.setProperty('--tx',t*SLOT_W+'px');
+      card.style.setProperty('--ry',t*-26);
+      card.style.setProperty('--sc',Math.max(0.42,1-at*0.175));
+      card.style.setProperty('--op',Math.max(0,1-at*0.26));
+      card.style.zIndex=Math.round(50-at*8);
+      card.style.pointerEvents=at<3?'auto':'none';
+      card.classList.toggle('active',i===snap);
+    });
+    if(snap!==lastActive&&snap>=0&&snap<cats.length){
+      lastActive=snap;CF_active=snap;
+      dotEls.forEach((d,i)=>d.className='cf-dot'+(i===snap?' on':''));
+      const cat=cats[snap];
+      document.getElementById('cf-lblN').textContent=cat.name;
+      document.getElementById('cf-lblS').textContent=cat.count+' '+(cat.count===1?'person':'people')+' · tap to see all';
+      renderCFContacts(cat);
+    }
+  }
+  driver.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(frame);},{passive:true,signal});
+  document.getElementById('cf-lbl').onclick=()=>{if(CF_CATS[CF_active])openCat(CF_CATS[CF_active]);};
+  setTimeout(()=>{
+    const hdr=document.querySelector('header');
+    if(hdr)document.documentElement.style.setProperty('--hdr-h',hdr.offsetHeight+'px');
+  },50);
+  driver.scrollLeft=0;frame();
+  renderCFContacts(cats[0]);
+}
+function renderCFContacts(cat){
+  const cfList=document.getElementById('cf-list');
+  if(!cfList)return;
+  const contacts=cat.contacts.slice(0,20);
+  LIST=contacts;
+  cfList.innerHTML=contacts.map((p,i)=>{mergeOverride(p);return row(p,i+1,cat.name,false);}).join('');
+  document.querySelectorAll('#cf-list .row').forEach(r=>r.onclick=e=>{
+    if(e.target.closest('.call'))return;
+    openProfile(contacts[+r.dataset.idx]);
+  });
 }
 function setHead(cat,title,sub){const ih=document.getElementById('dIco');ih.style.setProperty('--c',col(cat));ih.innerHTML=ico(cat);document.getElementById('dTitle').textContent=title;document.getElementById('dSub').textContent=sub}
 function openCat(c){setHead(c.name,c.name,`${c.count} ${c.count===1?'person':'people'}`);renderList(c.contacts,c.name,false);show('detail')}
@@ -601,7 +719,7 @@ document.getElementById('q').addEventListener('input',e=>{const raw=e.target.val
 document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
 document.querySelector('header .logo').onclick=()=>{document.getElementById('q').value='';show('home');home()};
 document.getElementById('pback').onclick=()=>show('detail');
-function show(v){['home','detail','profile','settings','admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===v?'block':'none'});scrollTo(0,0)}
+function show(v){['home','detail','profile','settings','admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===v?(id==='home'?'flex':'block'):'none'});scrollTo(0,0)}
 const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1006,6 +1124,39 @@ supabase.auth.onAuthStateChange(async(event,session)=>{
     </div>
   </div>
 </div>
+<!-- Update available toast -->
+<div id="upd-toast" role="status" aria-live="polite">
+  <i class="ti ti-refresh"></i>
+  <span>New update available!</span>
+  <button id="upd-reload">Refresh</button>
+  <button id="upd-dismiss" aria-label="Dismiss"><i class="ti ti-x"></i></button>
+</div>
+<script>
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+  const toast=document.getElementById('upd-toast');
+  function showUpdToast(){
+    toast.classList.add('show');
+  }
+  document.getElementById('upd-reload').onclick=()=>window.location.reload();
+  document.getElementById('upd-dismiss').onclick=()=>toast.classList.remove('show');
+  // If a SW is already in control, any future controllerchange = new SW took over = update
+  const wasControlled=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(wasControlled) showUpdToast();
+  });
+  // Also catch case where a new SW is waiting when page loads
+  navigator.serviceWorker.ready.then(reg=>{
+    if(reg.waiting && navigator.serviceWorker.controller) showUpdToast();
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;
+      nw.addEventListener('statechange',()=>{
+        if(nw.state==='installed' && navigator.serviceWorker.controller) showUpdToast();
+      });
+    });
+  });
+})();
+</script>
 <script>
 (function(){
   if(localStorage.getItem('pwa-dismissed')) return;
