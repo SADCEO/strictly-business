@@ -92,6 +92,9 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .legend>span{display:inline-flex;align-items:center;gap:6px}
 .legend .bd{font-size:10px;padding:2px 7px}
 .legend+.list{margin-top:10px}
+.see-all{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border-radius:20px;border:2px dashed color-mix(in srgb,var(--brand) 40%,var(--line));background:color-mix(in srgb,var(--brand) 6%,transparent);color:var(--brand);font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s,transform .15s}
+.see-all:hover{background:color-mix(in srgb,var(--brand) 12%,transparent);transform:translateY(-1px)}
+.see-all i{transition:transform .15s}.see-all:hover i{transform:translateX(3px)}
 .rm{font-size:12.5px;color:var(--soft);margin-top:5px;font-weight:600}.rm b{color:var(--ink)}
 .asks{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}
 .ask{font-size:11.5px;font-weight:600;color:var(--soft);background:var(--bg);border:1.5px solid var(--line);padding:4px 10px;border-radius:30px}
@@ -661,8 +664,12 @@ function initCoverFlow(cats){
 function renderCFContacts(cat){
   const cfList=document.getElementById('cf-list');
   if(!cfList)return;
-  const contacts=cat.contacts.slice(0,20);
-  cfList.innerHTML=contacts.map((p,i)=>{mergeOverride(p);return row(p,i+1,cat.name,false);}).join('');
+  const contacts=cat.contacts.slice(0,5);
+  const more=cat.contacts.length-contacts.length;
+  cfList.innerHTML=contacts.map((p,i)=>{mergeOverride(p);return row(p,i+1,cat.name,false);}).join('')
+    +(more>0?`<button type="button" class="see-all" id="cf-seeAll">See all ${cat.contacts.length} in ${esc(cat.name)}<i class="ti ti-arrow-right"></i></button>`:'');
+  const seeAll=document.getElementById('cf-seeAll');
+  if(seeAll)seeAll.onclick=()=>openCat(cat);
   document.querySelectorAll('#cf-list .row').forEach(r=>r.onclick=e=>{
     if(e.target.closest('.call'))return;
     openProfile(contacts[+r.dataset.idx]);
