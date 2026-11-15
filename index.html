@@ -53,11 +53,6 @@ header::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--
 .hero h2{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.08}
 :root[data-theme="dark"] .hero h2{background:linear-gradient(135deg,#E4E8FF 0%,#A78BFA 55%,#E4E8FF 100%);background-size:200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:textShimmer 7s ease-in-out infinite}
 @keyframes textShimmer{0%,100%{background-position:100% 50%}50%{background-position:0% 50%}}
-.stats{display:flex;gap:10px;margin-top:20px}
-.stat{flex:1;background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:14px;border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
-.stat b{font-size:21px;font-weight:800;display:block;letter-spacing:-.02em}
-:root[data-theme="dark"] .stat b{background:linear-gradient(135deg,#E4E8FF,#A78BFA);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.stat span{font-size:11px;color:var(--faint);font-weight:700;margin-top:3px;display:block;letter-spacing:.03em}
 .sl{font-size:16px;font-weight:800;letter-spacing:-.01em;margin:30px 4px 14px;display:flex;align-items:center;justify-content:space-between}
 .sl .mut{font-size:12.5px;color:var(--faint);font-weight:600}
 .cats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;perspective:1200px;scroll-snap-type:y proximity}
@@ -312,10 +307,6 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:1px sol
   .search::before{border-radius:16px}
   .search > i{left:14px;font-size:17px}
   .hero{padding:8px 0 0}
-  .stats{gap:6px;margin-top:0}
-  .stat{display:flex;align-items:baseline;justify-content:center;gap:5px;padding:7px 6px;border-radius:12px;border-width:1.5px}
-  .stat b{font-size:15px;display:inline}
-  .stat span{font-size:9.5px;margin-top:0;display:inline}
   .cf-wrapper{padding-bottom:4px}
   .cf-wrapper .sl{margin:8px 2px 4px;font-size:14px}
   .cf{height:132px}
@@ -358,7 +349,6 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:1px sol
   <div class="search"><i class="ti ti-search"></i><input id="q" placeholder="Search a trade/name or type anything..." autocomplete="off"><div class="search-bubble"><i class="ti ti-sparkles" style="font-size:13px;color:var(--brand);vertical-align:middle;margin-right:4px"></i>I'm a smart search! Type any word to see suggestions.</div></div>
 </header>
 <main id="home">
-  <div class="hero"><div class="stats" id="stats"></div></div>
   <div class="cf-wrapper" id="cf-wrapper">
     <div class="sl">Browse by trade <span class="mut" id="trc"></span></div>
     <div class="cf" id="cf">
@@ -663,8 +653,6 @@ document.getElementById('lform').addEventListener('submit',ev=>{ev.preventDefaul
 boxes[0].focus();
 
 function home(){
-  const s=DATA.stats;
-  document.getElementById('stats').innerHTML=`<div class="stat"><b>${s.listed.toLocaleString()}</b><span>RECOMMENDED</span></div><div class="stat"><b>${s.categories}</b><span>TRADES</span></div><div class="stat"><b>8 yrs</b><span>OF CHAT</span></div>`;
   document.getElementById('trc').textContent=`${DATA.categories.length} trades`;
   document.getElementById('uvCt').textContent=`${DATA.unverified.length.toLocaleString()} contacts`;
   document.getElementById('uvBtn').onclick=openUnverified;
