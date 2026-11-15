@@ -475,7 +475,78 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:1px sol
 const ICONS={"Real Estate":"ti-home","Legal":"ti-gavel","Construction / Contractor":"ti-backhoe","Landscaping / Lawn / Snow":"ti-plant-2","Plumbing":"ti-droplet","HVAC / Heating & AC":"ti-air-conditioning","Insurance":"ti-shield-half","Appliance Repair":"ti-wash-machine","Electrical":"ti-bolt","Accounting / Tax":"ti-calculator","IT / Computer / Web":"ti-device-laptop","Cleaning":"ti-spray","Printing / Signs / Promo":"ti-printer","Photography / Video":"ti-camera","Flooring":"ti-layout-grid","Catering / Food / Chef":"ti-tools-kitchen-2","Handyman":"ti-tool","Roofing / Gutters":"ti-home-2","Religious Services":"ti-star","Moving / Storage":"ti-truck-delivery","Medical / Dental / Therapy":"ti-stethoscope","Pest Control":"ti-bug","Auto Repair / Mechanic":"ti-car","Painting":"ti-paint","Graphic / Logo Design":"ti-palette","Mortgage":"ti-building-bank","Marketing / Social":"ti-speakerphone","Tires":"ti-disc","Towing / Roadside":"ti-truck","Locksmith":"ti-key","Auto Body / Glass":"ti-car-crash","Recording / Audio":"ti-microphone-2"};
 const FG=["#D2552C","#3E8E4F","#3B6FC4","#A4499A","#C98A1E","#2A8C86","#C9453F","#6A52C7","#7C8A2E"];
 const col=c=>FG[[...(c||'')].reduce((a,ch)=>a+ch.charCodeAt(0),0)%FG.length];
-const ico=c=>`<i class="ti ${ICONS[c]||'ti-point'}"></i>`;
+const ICON_KEYWORDS=[
+  [/hair|barber|salon|beauty|nail|makeup|wig|sheitel/,'ti-scissors'],
+  [/pet|dog|cat|vet|groom/,'ti-dog'],
+  [/baby|nanny|babysit|child ?care|daycare/,'ti-baby-carriage'],
+  [/tutor|teach|school|lesson|education|class/,'ti-school'],
+  [/travel|flight|airport|vacation/,'ti-plane'],
+  [/tailor|alteration|sew|seamstress/,'ti-needle-thread'],
+  [/cloth|fashion|apparel|shirt|dry ?clean/,'ti-shirt'],
+  [/jewel|diamond|watch/,'ti-diamond'],
+  [/flor|flower/,'ti-flower'],
+  [/bak|cake|dessert|pastry/,'ti-cake'],
+  [/pizza/,'ti-pizza'],
+  [/coffee|cafe/,'ti-coffee'],
+  [/wine|liquor|bar\b/,'ti-glass-full'],
+  [/fish/,'ti-fish'],
+  [/grocer|supermarket|store|shop/,'ti-shopping-cart'],
+  [/music|dj|band|singer/,'ti-music'],
+  [/event|party|wedding|simcha|bar mitzvah/,'ti-confetti'],
+  [/architect|engineer/,'ti-ruler-2'],
+  [/interior|decor|furniture|upholster/,'ti-sofa'],
+  [/window|blind|shade|glass/,'ti-window'],
+  [/door|garage/,'ti-car-garage'],
+  [/fenc|deck|patio/,'ti-fence'],
+  [/pool|spa|hot tub/,'ti-swimming'],
+  [/bath|kitchen|remodel|renovat/,'ti-bath'],
+  [/gas|fireplace|chimney|boiler/,'ti-flame'],
+  [/solar|energy/,'ti-solar-panel'],
+  [/junk|trash|waste|dumpster|recycl/,'ti-trash'],
+  [/pressure|power ?wash|water|waterproof/,'ti-droplets'],
+  [/carpent|cabinet|wood/,'ti-hammer'],
+  [/mason|brick|concrete|stone|paving|asphalt/,'ti-wall'],
+  [/stair|railing/,'ti-stairs'],
+  [/optic|optom|eye|glasses/,'ti-eyeglass'],
+  [/dent|ortho/,'ti-dental'],
+  [/pharm|pill|drug/,'ti-pill'],
+  [/fitness|gym|trainer|sport/,'ti-barbell'],
+  [/yoga|pilates/,'ti-yoga'],
+  [/massage|physio|chiro/,'ti-massage'],
+  [/nurs|home care|aide|caregiver/,'ti-nurse'],
+  [/doctor|medic|health|clinic/,'ti-heartbeat'],
+  [/therap|psych|counsel|coach/,'ti-brain'],
+  [/translat|language/,'ti-language'],
+  [/financ|bank|loan|invest|wealth/,'ti-report-money'],
+  [/phone|mobile|cell/,'ti-device-mobile'],
+  [/tv|audio ?visual|av\b|home theater|satellite|cable/,'ti-device-tv'],
+  [/security|alarm|camera|cctv/,'ti-shield-lock'],
+  [/network|internet|wifi/,'ti-wifi'],
+  [/gift/,'ti-gift'],
+  [/book|sofer|scribe|judaica|torah|mezuz/,'ti-script'],
+  [/law|attorney|notary/,'ti-scale'],
+  [/rental|property|landlord|apartment/,'ti-key'],
+  [/bus|car service|taxi|driver|limo|transport/,'ti-bus'],
+  [/bike|bicycle/,'ti-bike'],
+  [/motorcycle|scooter/,'ti-motorbike'],
+  [/tool|repair|fix|install|maintenance/,'ti-tools'],
+  [/light|lamp/,'ti-bulb'],
+  [/snow|ice/,'ti-snowflake'],
+  [/tree|arbor/,'ti-tree'],
+  [/garden|lawn|landscap/,'ti-leaf'],
+  [/fridge|refrigerat/,'ti-fridge'],
+  [/ship|courier|deliver|mail/,'ti-package'],
+  [/event|calendar|plann/,'ti-calendar-event'],
+  [/charit|volunteer|community/,'ti-heart-handshake'],
+  [/business|consult|office|admin/,'ti-briefcase']
+];
+const iconFor=c=>{
+  if(ICONS[c])return ICONS[c];
+  const n=String(c||'').toLowerCase();
+  const hit=ICON_KEYWORDS.find(([re])=>re.test(n));
+  return hit?hit[1]:'ti-briefcase';
+};
+const ico=c=>`<i class="ti ${iconFor(c)}"></i>`;
 const initials=n=>(n||'?').replace(/[^a-zA-Z ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 let DATA=null;
 
