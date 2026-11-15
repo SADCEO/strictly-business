@@ -466,7 +466,7 @@ const FG=["#D2552C","#3E8E4F","#3B6FC4","#A4499A","#C98A1E","#2A8C86","#C9453F",
 const col=c=>FG[[...(c||'')].reduce((a,ch)=>a+ch.charCodeAt(0),0)%FG.length];
 const ico=c=>`<i class="ti ${ICONS[c]||'ti-point'}"></i>`;
 const initials=n=>(n||'?').replace(/[^a-zA-Z ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
-let DATA=null,LIST=[];
+let DATA=null;
 
 /* --- manual / admin-curated contact placements ---
    Category placement lives in the data layer. contact_overrides (Supabase) only
@@ -662,7 +662,6 @@ function renderCFContacts(cat){
   const cfList=document.getElementById('cf-list');
   if(!cfList)return;
   const contacts=cat.contacts.slice(0,20);
-  LIST=contacts;
   cfList.innerHTML=contacts.map((p,i)=>{mergeOverride(p);return row(p,i+1,cat.name,false);}).join('');
   document.querySelectorAll('#cf-list .row').forEach(r=>r.onclick=e=>{
     if(e.target.closest('.call'))return;
@@ -684,9 +683,8 @@ function mergeOverride(p){
   return p;
 }
 function renderList(arr,cat,uv){
-  LIST=arr;
   document.getElementById('dList').innerHTML=arr.map((p,i)=>{mergeOverride(p);return row(p,i+1,cat||p._override_category||p.category,uv)}).join('');
-  document.querySelectorAll('#dList .row').forEach(r=>r.onclick=e=>{if(e.target.closest('.call'))return;openProfile(LIST[+r.dataset.idx])});
+  document.querySelectorAll('#dList .row').forEach(r=>r.onclick=e=>{if(e.target.closest('.call'))return;openProfile(arr[+r.dataset.idx])});
 }
 function row(p,rk,cat,uv){
   const medal=rk<=3&&!uv?['🥇','🥈','🥉'][rk-1]:'';
