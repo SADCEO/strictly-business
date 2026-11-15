@@ -255,7 +255,8 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .cf{position:relative;height:194px;overflow:hidden}
 .cf-driver{position:absolute;inset:0;z-index:3;overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
 .cf-driver::-webkit-scrollbar{display:none}
-.cf-slots{display:flex;padding:0 calc(50% - 40px);height:100%}
+.cf-slots{display:flex;width:max-content;height:100%}
+.cf-pad{flex:0 0 auto;height:100%}
 .cf-slot{flex:0 0 80px;scroll-snap-align:center;height:100%}
 .cf-stage{position:absolute;inset:0;z-index:2;pointer-events:none;perspective:750px}
 .cc{position:absolute;width:155px;height:158px;left:50%;top:50%;transform:translateX(calc(-50% + var(--tx,0px))) translateY(-50%) rotateY(calc(var(--ry,0)*1deg)) scale(var(--sc,1));opacity:var(--op,1);transform-origin:center center;background:var(--card);border:2px solid var(--line);border-radius:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;text-align:center;transition:border-color .25s,box-shadow .25s;will-change:transform,opacity}
@@ -276,7 +277,7 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .cf-contacts .sl{margin:24px 4px 14px}
 .cf-contacts .uv{margin-top:0}
 .cf-contacts footer{margin-top:16px}
-</style></head>
+</style><meta property="og:image" content="https://bolt.new/static/og_default.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://bolt.new/static/og_default.png"></head>
 <body>
 <div id="lock">
   <div class="llogo"><img src="logo.png" alt="Strictly Business" style="width:100%;height:100%;object-fit:contain"></div>
@@ -529,7 +530,15 @@ function initCoverFlow(cats){
   if(!driver||!slotsEl||!stage||!dotsEl)return;
   slotsEl.innerHTML='';stage.innerHTML='';dotsEl.innerHTML='';
   const SLOT_W=80;
+  const pads=[0,1].map(()=>{const p=document.createElement('div');p.className='cf-pad';return p;});
+  slotsEl.appendChild(pads[0]);
   cats.forEach(()=>{const s=document.createElement('div');s.className='cf-slot';slotsEl.appendChild(s);});
+  slotsEl.appendChild(pads[1]);
+  const sizePads=()=>{const w=Math.max(0,driver.clientWidth/2-SLOT_W/2)+'px';pads.forEach(p=>p.style.width=w);};
+  sizePads();
+  const ro=new ResizeObserver(()=>{sizePads();driver.scrollLeft=CF_active*SLOT_W;if(!raf)raf=requestAnimationFrame(frame);});
+  ro.observe(driver);
+  signal.addEventListener('abort',()=>ro.disconnect());
   const cards=cats.map((cat,i)=>{
     const c=document.createElement('div');c.className='cc';
     c.innerHTML=`<div class="cc-icon">${ico(cat.name)}</div><div class="cc-name">${esc(cat.name)}</div><div class="cc-ct">${cat.count} ${cat.count===1?'person':'people'}</div>`;
