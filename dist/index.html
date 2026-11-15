@@ -87,6 +87,7 @@ header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 8
 .bd{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
 .bd.c{background:color-mix(in srgb,#3E8E4F 16%,transparent);color:#3E8E4F}
 .bd.l{background:color-mix(in srgb,#C98A1E 16%,transparent);color:#C98A1E}
+.mc-dot{width:8px;height:8px;border-radius:50%;background:#7B52E8;flex:none;display:inline-block;margin-left:1px;vertical-align:middle}
 .rm{font-size:12.5px;color:var(--soft);margin-top:5px;font-weight:600}.rm b{color:var(--ink)}
 .asks{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}
 .ask{font-size:11.5px;font-weight:600;color:var(--soft);background:var(--bg);border:1.5px solid var(--line);padding:4px 10px;border-radius:30px}
@@ -611,7 +612,8 @@ function row(p,rk,cat,uv){
   const bd=p.confidence==='high'?'<span class="bd c"><i class="ti ti-rosette-discount-check" style="font-size:12px"></i>Confirmed</span>':'<span class="bd l">Likely</span>';
   const tel=p.phone?`<a class="call" href="tel:${p.phone}"><i class="ti ti-phone"></i>Call</a>`:'';
   const meta=(p.vouchers>0)?('<b>'+p.vouchers+'</b> vouched'+(p.last?' · '+p.last.slice(0,4):'')):'';
-  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(displayName)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(displayName)}</span>${bd}</div>${meta?`<div class="rm">${meta}</div>`:''}${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
+  const mcDot=(p.trades||[]).length>1?'<span class="mc-dot" title="Listed in multiple categories"></span>':'';
+  return `<div class="row" data-idx="${rk-1}"><div class="av" style="--c:${col(cat)}">${initials(displayName)}</div><div class="rb"><div class="rtop">${medal?`<span class="medal">${medal}</span>`:''}<span class="rn">${esc(displayName)}</span>${bd}${mcDot}</div>${meta?`<div class="rm">${meta}</div>`:''}${asks?`<div class="asks">${asks}</div>`:''}</div>${tel}<i class="ti ti-chevron-right chev"></i></div>`;
 }
 function openProfile(p){
   mergeOverride(p);
