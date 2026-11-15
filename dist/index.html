@@ -529,7 +529,7 @@ function initCoverFlow(cats){
   if(!driver||!slotsEl||!stage||!dotsEl)return;
   slotsEl.innerHTML='';stage.innerHTML='';dotsEl.innerHTML='';
   const SLOT_W=80;
-  const spW=Math.max(0,Math.floor(driver.clientWidth/2-SLOT_W/2))+'px';
+  const spW=Math.max(0,Math.floor((driver.clientWidth||window.innerWidth)/2-SLOT_W/2))+'px';
   const spL=document.createElement('div');spL.style.cssText=`flex:0 0 ${spW};width:${spW};height:100%`;slotsEl.appendChild(spL);
   cats.forEach(()=>{const s=document.createElement('div');s.className='cf-slot';slotsEl.appendChild(s);});
   const spR=document.createElement('div');spR.style.cssText=`flex:0 0 ${spW};width:${spW};height:100%`;slotsEl.appendChild(spR);
