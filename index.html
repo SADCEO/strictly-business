@@ -20,15 +20,6 @@
 :root[data-theme="dark"]{--bg:#09090F;--card:rgba(14,16,30,0.90);--card2:rgba(18,20,36,0.90);--ink:#E4E8FF;--soft:#8B92C0;--faint:#4A5178;--line:rgba(99,102,241,0.22);--brand:#F07050;--brand-ink:#fff;--shadow:0 20px 60px rgba(0,0,0,.55),0 2px 8px rgba(0,0,0,.30);--shadow2:0 28px 72px rgba(0,0,0,.70),0 0 50px rgba(79,70,229,.14)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;color:var(--ink);background:var(--bg);max-width:1180px;margin:0 auto;padding:0 18px 0}
-body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:
-    radial-gradient(circle at 100% 100%,transparent 0 179px,color-mix(in srgb,var(--brand) 22%,transparent) 180px 181px,transparent 182px),
-    radial-gradient(circle at 100% 100%,transparent 0 279px,color-mix(in srgb,var(--ink) 9%,transparent) 280px 281px,transparent 282px),
-    radial-gradient(circle at 100% 100%,transparent 0 399px,color-mix(in srgb,var(--ink) 6%,transparent) 400px 401px,transparent 402px),
-    radial-gradient(circle,color-mix(in srgb,var(--ink) 13%,transparent) 1px,transparent 1.6px) 0 0/22px 22px;
-  -webkit-mask-image:linear-gradient(170deg,transparent 28%,#000 75%);mask-image:linear-gradient(170deg,transparent 28%,#000 75%)}
-body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-:root[data-theme="dark"] body::after{opacity:.07;mix-blend-mode:screen;filter:invert(1)}
 button,a{font-family:inherit;color:inherit;text-decoration:none;cursor:pointer;border:none;background:none}
 .ti{font-size:inherit}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
