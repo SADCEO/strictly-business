@@ -222,17 +222,19 @@ footer{margin:auto 0 0 0 !important;padding:12px 0 !important;border-top:2px sol
 .sms-verify:hover{background:color-mix(in srgb,#2A8C86 12%,transparent)}
 .pact-share{border-color:#2A8C86;color:#2A8C86}
 .pact-share:hover{background:color-mix(in srgb,#2A8C86 10%,transparent)}
-/* update toast */
-#upd-toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(100px);z-index:95;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);padding:12px 14px 12px 16px;border-radius:50px;box-shadow:0 8px 28px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:transform .36s cubic-bezier(.34,1.42,.64,1),opacity .28s;white-space:nowrap;max-width:calc(100vw - 36px)}
-#upd-toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
-#upd-toast i{font-size:18px;flex:none;animation:updSpin 1.4s linear infinite;animation-play-state:paused}
-#upd-toast.show i{animation-play-state:running}
+/* update modal */
+#upd-backdrop{position:fixed;inset:0;z-index:198;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .28s;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+#upd-backdrop.show{opacity:1;pointer-events:auto}
+#upd-sheet{position:fixed;bottom:0;left:0;right:0;z-index:199;background:var(--card);border-radius:24px 24px 0 0;padding:28px 24px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;transform:translateY(100%);transition:transform .38s cubic-bezier(.34,1.28,.64,1);box-shadow:0 -4px 40px rgba(0,0,0,.18)}
+#upd-sheet.show{transform:translateY(0)}
+#upd-pill{width:36px;height:4px;border-radius:2px;background:var(--line);margin-bottom:20px}
+#upd-icon{width:60px;height:60px;border-radius:18px;background:color-mix(in srgb,var(--brand) 12%,var(--bg));display:grid;place-items:center;font-size:28px;margin-bottom:16px}
+#upd-sheet h3{font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:0 0 6px;text-align:center}
+#upd-sheet p{font-size:14px;color:var(--soft);text-align:center;margin:0 0 24px;line-height:1.45;max-width:280px}
+#upd-reload{width:100%;height:50px;border-radius:14px;background:var(--brand);color:#fff;font-size:15px;font-weight:800;letter-spacing:-.01em;transition:opacity .15s;margin-bottom:12px}
+#upd-reload:active{opacity:.82}
+#upd-dismiss{font-size:14px;font-weight:600;color:var(--soft);padding:8px 24px;background:none;border:none;cursor:pointer}
 @keyframes updSpin{to{transform:rotate(360deg)}}
-#upd-toast span{font-size:13.5px;font-weight:700;flex:1}
-#upd-reload{height:32px;padding:0 14px;border-radius:30px;background:var(--brand);color:var(--brand-ink);font-size:12.5px;font-weight:700;flex:none;white-space:nowrap;transition:opacity .15s}
-#upd-reload:hover{opacity:.88}
-#upd-dismiss{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.12);color:inherit;font-size:14px;display:grid;place-items:center;flex:none;margin-left:2px}
-#upd-dismiss:hover{background:rgba(255,255,255,.22)}
 /* trainer modal */
 #trainer-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,16,12,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
 #trainer-overlay.active{opacity:1;pointer-events:auto}
@@ -1124,34 +1126,61 @@ supabase.auth.onAuthStateChange(async(event,session)=>{
     </div>
   </div>
 </div>
-<!-- Update available toast -->
-<div id="upd-toast" role="status" aria-live="polite">
-  <i class="ti ti-refresh"></i>
-  <span>New update available!</span>
-  <button id="upd-reload">Refresh</button>
-  <button id="upd-dismiss" aria-label="Dismiss"><i class="ti ti-x"></i></button>
+<!-- Update available modal -->
+<div id="upd-backdrop" aria-hidden="true"></div>
+<div id="upd-sheet" role="dialog" aria-modal="true" aria-label="Update available">
+  <div id="upd-pill"></div>
+  <div id="upd-icon"><i class="ti ti-sparkles"></i></div>
+  <h3>Update Available</h3>
+  <p>A new version of Strictly Business is ready. Tap below to reload with the latest.</p>
+  <button id="upd-reload"><i class="ti ti-refresh"></i> &nbsp;Update Now</button>
+  <button id="upd-dismiss">Later</button>
 </div>
 <script>
 (function(){
   if(!('serviceWorker' in navigator)) return;
-  const toast=document.getElementById('upd-toast');
-  function showUpdToast(){
-    toast.classList.add('show');
+  const backdrop=document.getElementById('upd-backdrop');
+  const sheet=document.getElementById('upd-sheet');
+  let shown=false;
+  function showUpd(){
+    if(shown) return;
+    shown=true;
+    backdrop.classList.add('show');
+    sheet.classList.add('show');
   }
-  document.getElementById('upd-reload').onclick=()=>window.location.reload();
-  document.getElementById('upd-dismiss').onclick=()=>toast.classList.remove('show');
-  // If a SW is already in control, any future controllerchange = new SW took over = update
+  function hideUpd(){
+    backdrop.classList.remove('show');
+    sheet.classList.remove('show');
+  }
+  // Hard refresh: unregister SW + clear all caches + reload
+  // This bypasses every cached layer — works for installed PWAs too
+  document.getElementById('upd-reload').onclick=async function(){
+    this.disabled=true;
+    this.textContent='Reloading…';
+    try{
+      const reg=await navigator.serviceWorker.getRegistration();
+      if(reg) await reg.unregister();
+      if('caches' in window){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+    window.location.reload();
+  };
+  document.getElementById('upd-dismiss').onclick=hideUpd;
+  backdrop.onclick=hideUpd;
+  // Trigger: new SW took over (skipWaiting already called in SW install)
   const wasControlled=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    if(wasControlled) showUpdToast();
+    if(wasControlled) showUpd();
   });
-  // Also catch case where a new SW is waiting when page loads
+  // Trigger: SW waiting when page loads (user reopened after update installed)
   navigator.serviceWorker.ready.then(reg=>{
-    if(reg.waiting && navigator.serviceWorker.controller) showUpdToast();
+    if(reg.waiting && navigator.serviceWorker.controller) showUpd();
     reg.addEventListener('updatefound',()=>{
       const nw=reg.installing;
       nw.addEventListener('statechange',()=>{
-        if(nw.state==='installed' && navigator.serviceWorker.controller) showUpdToast();
+        if(nw.state==='installed' && navigator.serviceWorker.controller) showUpd();
       });
     });
   });
