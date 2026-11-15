@@ -789,7 +789,9 @@ function mergeOverride(p){
   if(p.name==='IT Tech')p._override_name='AdvancePC Tech - Leib Goldberg';
   return p;
 }
+var DETAIL_LIST=null;
 function renderList(arr,cat,uv){
+  DETAIL_LIST=[arr,cat,uv];
   document.getElementById('dList').innerHTML=arr.map((p,i)=>{mergeOverride(p);return row(p,i+1,cat||p._override_category||p.category,uv)}).join('');
   document.querySelectorAll('#dList .row').forEach(r=>r.onclick=e=>{if(e.target.closest('.call'))return;openProfile(arr[+r.dataset.idx])});
 }
@@ -917,12 +919,75 @@ function levenshtein(a,b){
   }
   return row[a.length];
 }
-document.getElementById('q').addEventListener('input',e=>{const raw=e.target.value.trim();const t=raw.toLowerCase();if(!t){show('home');return}if(!SEARCH_INDEX.length)buildSearchIndex();const tokens=t.split(/\s+/).filter(Boolean);const scored=[];for(let i=0;i<SEARCH_INDEX.length;i++){const entry=SEARCH_INDEX[i];const s=fuzzyMatch(tokens,entry.text);if(s>0)scored.push({person:entry.person,score:s});}scored.sort((a,b)=>b.score-a.score||(b.person.score||0)-(a.person.score||0));const hits=scored.map(s=>s.person);const ih=document.getElementById('dIco');ih.style.setProperty('--c','#D2552C');ih.innerHTML='<i class=”ti ti-search”></i>';document.getElementById('dTitle').textContent='”'+raw+'”';document.getElementById('dSub').textContent=hits.length+' matches';if(hits.length)renderList(hits.slice(0,80),null,false);else document.getElementById('dList').innerHTML='<div class=”empty”>No matches yet.</div>';show('detail')});
-document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
+document.getElementById('q').addEventListener('input',e=>{const raw=e.target.value.trim();const t=raw.toLowerCase();if(!t){show('home');return}if(!SEARCH_INDEX.length)buildSearchIndex();const tokens=t.split(/\s+/).filter(Boolean);const scored=[];for(let i=0;i<SEARCH_INDEX.length;i++){const entry=SEARCH_INDEX[i];const s=fuzzyMatch(tokens,entry.text);if(s>0)scored.push({person:entry.person,score:s});}scored.sort((a,b)=>b.score-a.score||(b.person.score||0)-(a.person.score||0));const hits=scored.map(s=>s.person);const ih=document.getElementById('dIco');ih.style.setProperty('--c','#D2552C');ih.innerHTML='<i class="ti ti-search"></i>';document.getElementById('dTitle').textContent='”'+raw+'”';document.getElementById('dSub').textContent=hits.length+' matches';if(hits.length)renderList(hits.slice(0,80),null,false);else{DETAIL_LIST=null;document.getElementById('dList').innerHTML='<div class="empty">No matches yet.</div>'}show('detail')});
+document.getElementById('back').onclick=()=>navBack();
 document.querySelector('header .logo').onclick=()=>{document.getElementById('q').value='';show('home');home()};
-var CUR_VIEW='home',PROFILE_FROM='home';
-document.getElementById('pback').onclick=()=>show(PROFILE_FROM);
-function show(v){if(v==='profile'&&CUR_VIEW!=='profile')PROFILE_FROM=CUR_VIEW;CUR_VIEW=v;['home','detail','profile','settings','admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===v?(id==='home'?'flex':'block'):'none'});scrollTo(0,0)}
+var CUR_VIEW='home';
+/* Each non-home screen gets a browser history entry so the phone's back swipe / back button works. */
+var NAV=[],NAV_DEPTH=0,NAV_SILENT=0,NAV_RESTORING=false;
+function navSnap(v){
+  if(v==='profile')return{v,p:window._currentViewedContact};
+  if(v==='detail'){const ih=document.getElementById('dIco');return{v,head:{ico:ih.innerHTML,c:ih.style.getPropertyValue('--c'),t:document.getElementById('dTitle').textContent,s:document.getElementById('dSub').textContent},list:DETAIL_LIST,empty:document.getElementById('dList').innerHTML}}
+  return{v};
+}
+function navRestore(depth){
+  const s=NAV[depth-1];
+  NAV_RESTORING=true;
+  try{
+    if(!s){document.getElementById('q').value='';show('home')}
+    else if(s.v==='profile')openProfile(s.p);
+    else if(s.v==='detail'){
+      const ih=document.getElementById('dIco');ih.style.setProperty('--c',s.head.c);ih.innerHTML=s.head.ico;
+      document.getElementById('dTitle').textContent=s.head.t;document.getElementById('dSub').textContent=s.head.s;
+      if(s.list)renderList(...s.list);else document.getElementById('dList').innerHTML=s.empty;
+      show('detail');
+    }
+    else show(s.v);
+  }finally{NAV_RESTORING=false}
+}
+function navBack(){if(NAV_DEPTH>0)history.back();else{document.getElementById('q').value='';show('home')}}
+addEventListener('popstate',e=>{
+  if(NAV_SILENT){NAV_SILENT--;return}
+  NAV_DEPTH=(e.state&&e.state.sbNav)||0;
+  navRestore(NAV_DEPTH);
+});
+document.getElementById('pback').onclick=()=>navBack();
+function show(v){
+  if(!NAV_RESTORING){
+    if(v==='home'){if(NAV_DEPTH>0){NAV_SILENT++;history.go(-NAV_DEPTH);NAV_DEPTH=0}}
+    else if(v!==CUR_VIEW){NAV.length=NAV_DEPTH;NAV.push(null);NAV_DEPTH++;history.pushState({sbNav:NAV_DEPTH},'')}
+  }
+  CUR_VIEW=v;['home','detail','profile','settings','admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===v?(id==='home'?'flex':'block'):'none'});
+  if(v!=='home'&&NAV_DEPTH>0)NAV[NAV_DEPTH-1]=navSnap(v);
+  scrollTo(0,0);
+}
+/* iPhone home-screen apps have no built-in back swipe, so add one from the left edge. */
+(function(){
+  if(!navigator.standalone)return;
+  let el=null,sx=0,sy=0,dx=0,dir=null;
+  const reset=v=>{v.style.transition='transform .22s ease,opacity .22s ease';v.style.transform='';v.style.opacity='';setTimeout(()=>{v.style.transition=''},230)};
+  addEventListener('touchstart',e=>{
+    if(NAV_DEPTH===0||e.touches.length!==1)return;
+    const t=e.touches[0];if(t.clientX>30)return;
+    el=document.getElementById(CUR_VIEW);sx=t.clientX;sy=t.clientY;dx=0;dir=null;
+  },{passive:true});
+  addEventListener('touchmove',e=>{
+    if(!el)return;
+    const t=e.touches[0];dx=t.clientX-sx;const dy=t.clientY-sy;
+    if(dir===null){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;dir=dx>Math.abs(dy)?'h':'v';if(dir==='v'){el=null;return}el.style.transition='none'}
+    const x=Math.max(0,dx);el.style.transform=`translateX(${x}px)`;el.style.opacity=String(1-Math.min(x/innerWidth,1)*.35);
+  },{passive:true});
+  const end=()=>{
+    if(!el||dir!=='h'){el=null;return}
+    const v=el;el=null;
+    if(dx>innerWidth*.28){
+      v.style.transition='transform .2s ease,opacity .2s ease';v.style.transform=`translateX(${innerWidth}px)`;v.style.opacity='0';
+      setTimeout(()=>{v.style.transition='';v.style.transform='';v.style.opacity='';navBack()},200);
+    }else reset(v);
+  };
+  addEventListener('touchend',end);
+  addEventListener('touchcancel',()=>{dx=0;end()});
+})();
 const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -1088,7 +1153,7 @@ function showSettings(){
   document.getElementById('adminCard').style.display=(userProfile&&userProfile.role==='admin')?'block':'none';
   show('settings');
 }
-document.getElementById('setBack').onclick=()=>show('home');
+document.getElementById('setBack').onclick=()=>navBack();
 document.getElementById('goAdminBtn').onclick=()=>{show('admin');loadAdmin()};
 document.getElementById('logoutBtn').onclick=async()=>{
   await supabase.auth.signOut();
@@ -1144,7 +1209,7 @@ document.getElementById('correctSubmit').onclick=async()=>{
 };
 
 // --- Admin Dashboard ---
-document.getElementById('adminBack').onclick=()=>show('home');
+document.getElementById('adminBack').onclick=()=>navBack();
 
 let adminTab='claims';
 document.getElementById('tabClaims').onclick=()=>{adminTab='claims';updateAdminTabs();loadAdmin()};
