@@ -798,8 +798,9 @@ function levenshtein(a,b){
 document.getElementById('q').addEventListener('input',e=>{const raw=e.target.value.trim();const t=raw.toLowerCase();if(!t){show('home');return}if(!SEARCH_INDEX.length)buildSearchIndex();const tokens=t.split(/\s+/).filter(Boolean);const scored=[];for(let i=0;i<SEARCH_INDEX.length;i++){const entry=SEARCH_INDEX[i];const s=fuzzyMatch(tokens,entry.text);if(s>0)scored.push({person:entry.person,score:s});}scored.sort((a,b)=>b.score-a.score||(b.person.score||0)-(a.person.score||0));const hits=scored.map(s=>s.person);const ih=document.getElementById('dIco');ih.style.setProperty('--c','#D2552C');ih.innerHTML='<i class=”ti ti-search”></i>';document.getElementById('dTitle').textContent='”'+raw+'”';document.getElementById('dSub').textContent=hits.length+' matches';if(hits.length)renderList(hits.slice(0,80),null,false);else document.getElementById('dList').innerHTML='<div class=”empty”>No matches yet.</div>';show('detail')});
 document.getElementById('back').onclick=()=>{document.getElementById('q').value='';show('home')};
 document.querySelector('header .logo').onclick=()=>{document.getElementById('q').value='';show('home');home()};
-document.getElementById('pback').onclick=()=>show('detail');
-function show(v){['home','detail','profile','settings','admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===v?(id==='home'?'flex':'block'):'none'});scrollTo(0,0)}
+var CUR_VIEW='home',PROFILE_FROM='home';
+document.getElementById('pback').onclick=()=>show(PROFILE_FROM);
+function show(v){if(v==='profile'&&CUR_VIEW!=='profile')PROFILE_FROM=CUR_VIEW;CUR_VIEW=v;['home','detail','profile','settings','admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===v?(id==='home'?'flex':'block'):'none'});scrollTo(0,0)}
 const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
